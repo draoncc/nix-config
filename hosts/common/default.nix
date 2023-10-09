@@ -3,6 +3,7 @@
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
+    inputs.disko.nixosModules.disko
   ];
 
   home-manager.extraSpecialArgs = { inherit inputs outputs; };
