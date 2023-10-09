@@ -7,15 +7,12 @@
 {
   networking.hostName = "c302-nixos";
 
-  disko.devices = pkgs.callPackage ../common/disko-config.nix {
-    disk = "/dev/mmcblk0";
-  };
-
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
 
       ../common
+      ../common/disko-config.nix
       ../common/desktop.nix
 
       ../common/users/cino

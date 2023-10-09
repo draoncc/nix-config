@@ -1,11 +1,11 @@
-{ device, ... }:
+{ disk, ... }:
 
 {
   disko.devices = {
     disk = {
       vdb = {
         type = "disk";
-        device = device;
+        device = disk;
         content = {
           type = "gpt";
           partitions = {
