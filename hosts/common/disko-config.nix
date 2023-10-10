@@ -33,8 +33,8 @@
                     mountpoint = "/";
                   };
                   # Subvolume name is the same as the mountpoint
-                  "/persist" = {
-                    mountpoint = "/persist";
+                  "/home" = {
+                    mountpoint = "/home";
                     mountOptions = [ "compress=zstd" ];
                   };
                   # Parent is not mounted so the mountpoint must be set

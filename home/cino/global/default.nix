@@ -39,7 +39,7 @@
     };
 
     persistence = {
-      "/persist/home/${config.home.username}" = {
+      "/home/${config.home.username}" = {
         directories = [
           "Documents"
           "Downloads"
