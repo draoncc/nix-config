@@ -25,12 +25,13 @@
     # Taken from: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/11
     displayManager = {
       defaultSession = "none+fake";
-      session =
-        let fakeSession = { manage = "window";
-	                    name = "fake";
-			    start = "";
-			  };
-	in [ fakeSession ];
+      session = let
+        fakeSession = {
+          manage = "window";
+          name = "fake";
+          start = "";
+        };
+      in [ fakeSession ];
     };
   };
 }

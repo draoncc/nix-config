@@ -1,4 +1,4 @@
-{ pkgs, ... }: 
+{ pkgs, ... }:
 
 {
   programs.git = {
@@ -8,9 +8,7 @@
     userName = "Cino";
     userEmail = "draoncc@gmail.com";
 
-    extraConfig = {
-      init.defaultBranch = "main";
-    };
+    extraConfig = { init.defaultBranch = "main"; };
     lfs.enable = true;
     ignores = [ ".direnv" ];
   };

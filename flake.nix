@@ -19,18 +19,18 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ...}@inputs:
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
       systems = [ "x86_64-linux" ];
       forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
-      pkgsFor = lib.genAttrs systems (system: import nixpkgs {
-        inherit system;
-        config.allowUnfree = true;
-      });
-    in
-    {
+      pkgsFor = lib.genAttrs systems (system:
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        });
+    in {
       inherit lib;
 
       devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
@@ -52,4 +52,4 @@
         };
       };
     };
-} 
+}

@@ -29,9 +29,7 @@
                 # unless their parent is mounted
                 subvolumes = {
                   # Subvolume name is different from mountpoint
-                  "/rootfs" = {
-                    mountpoint = "/";
-                  };
+                  "/rootfs" = { mountpoint = "/"; };
                   # Subvolume name is the same as the mountpoint
                   "/home" = {
                     mountpoint = "/home";

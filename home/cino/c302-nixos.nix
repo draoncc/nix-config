@@ -1,8 +1,5 @@
 { inputs, outputs, ... }:
 
 {
-  imports = [
-    ./global
-    ./features/desktop/i3
-  ];
+  imports = [ ./global ./features/desktop/i3 ];
 }

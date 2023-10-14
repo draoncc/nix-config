@@ -1,17 +1,13 @@
 { pkgs, inputs, ... }:
 
 {
-  imports = [
-    ./zsh.nix
-    ./direnv.nix
-    ./starship.nix
-    ./git.nix
-  ];
+  imports = [ ./zsh ./direnv.nix ./starship.nix ./git.nix ];
 
   home.packages = with pkgs; [
     comma # Install and run programs by sticking a , before them
 
     jq # JSON pretty printer and manipulator
+    silver-searcher # Search file contents
 
     nil # Nix LSP
     nixfmt # Nix formatter

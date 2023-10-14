@@ -34,19 +34,12 @@
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "23.05";
     sessionPath = [ "$HOME/.local/bin" ];
-    sessionVariables = {
-      FLAKE = "$HOME/Documents/NixConfig";
-    };
+    sessionVariables = { FLAKE = "$HOME/Documents/NixConfig"; };
 
     persistence = {
       "/home/${config.home.username}" = {
-        directories = [
-          "Documents"
-          "Downloads"
-          "Pictures"
-          "Videos"
-          ".local/bin"
-        ];
+        directories =
+          [ "Documents" "Downloads" "Pictures" "Videos" ".local/bin" ];
         allowOther = true;
       };
     };

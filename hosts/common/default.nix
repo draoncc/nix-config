@@ -4,9 +4,11 @@
   imports = [
     inputs.home-manager.nixosModules.home-manager
     inputs.disko.nixosModules.disko
+    ./zsh.nix
   ];
 
   programs.fuse.userAllowOther = true;
+  boot.initrd.systemd.enable = true;
 
   home-manager.extraSpecialArgs = { inherit inputs outputs; };
 
@@ -21,7 +23,7 @@
   i18n.defaultLocale = "en_US.UTF-8";
   console = {
     font = "Lat2-Terminus16";
-  #   keyMap = "us";
+    #   keyMap = "us";
     useXkbConfig = true; # use xkbOptions in tty.
   };
 
@@ -29,6 +31,7 @@
     # Configure keymap in X11
     layout = "us";
     xkbVariant = "dvp";
-    xkbOptions = "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
+    xkbOptions =
+      "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
   };
 }

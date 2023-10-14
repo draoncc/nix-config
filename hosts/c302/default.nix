@@ -7,17 +7,17 @@
 {
   networking.hostName = "c302-nixos";
 
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+  imports = [ # Include the results of the hardware scan.
+    ./hardware-configuration.nix
 
-      ../common
-      ../common/disko-config.nix
-      ../common/desktop.nix
-      ../common/touchpad.nix
+    ../common
+    ../common/disko-config.nix
 
-      ../common/users/cino
-    ];
+    ../common/optional/desktop.nix
+    ../common/optional/touchpad.nix
+
+    ../common/users/cino
+  ];
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
