@@ -6,6 +6,8 @@
     inputs.disko.nixosModules.disko
   ];
 
+  programs.fuse.userAllowOther = true;
+
   home-manager.extraSpecialArgs = { inherit inputs outputs; };
 
   # Set your time zone.
