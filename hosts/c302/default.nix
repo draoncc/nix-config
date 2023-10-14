@@ -14,6 +14,7 @@
       ../common
       ../common/disko-config.nix
       ../common/desktop.nix
+      ../common/touchpad.nix
 
       ../common/users/cino
     ];
