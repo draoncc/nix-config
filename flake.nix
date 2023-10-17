@@ -5,6 +5,8 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     impermanence.url = "github:nix-community/impermanence";
 
+    nix-colors.url = "github:misterio77/nix-colors";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,9 +34,14 @@
         });
     in {
       inherit lib;
+      homeManagerModules = import ./modules/home-manager;
 
       devShells = forEachSystem (pkgs: import ./shell.nix { inherit pkgs; });
       formatter = forEachSystem (pkgs: pkgs.nixpkgs-fmt);
+
+      overlays = import ./overlays { inherit inputs outputs; };
+
+      packages = forEachSystem (pkgs: import ./pkgs { inherit pkgs; });
 
       nixosConfigurations = {
         # Asus Chromebook

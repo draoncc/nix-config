@@ -1,6 +1,7 @@
 { lib, ... }:
 
 {
+  programs.thefuck.enable = true;
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
@@ -16,7 +17,6 @@
     enableAutosuggestions = true;
 
     shellAliases = {
-      e = "$EDITOR";
       p = "gopass";
       ls = "LC_COLLATE=C ls --color=auto --group-directories-first";
       ll = "ls -l";
@@ -25,6 +25,14 @@
     };
 
     initExtra = builtins.concatStringsSep "\n" [
+      # Fix "widgets can only be called when zle is active" on jump
+      # https://github.com/ohmyzsh/ohmyzsh/issues/3620#issuecomment-75435240
+      ''
+        TRAPWINCH() {
+          zle && { zle reset-prompt; zle -R }
+        }
+        bindkey '^g' jump
+      ''
       (lib.strings.fileContents ./keybindings.zsh)
       (lib.strings.fileContents ./options.zsh)
       (lib.strings.fileContents ./functions.zsh)

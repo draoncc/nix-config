@@ -3,7 +3,6 @@
     # UI
     vim-illuminate
     vim-numbertoggle
-    vim-smoothie
     vim-better-whitespace
     nvim-cursorline
 
@@ -137,7 +136,9 @@
       type = "lua";
       config = # lua
         ''
-          require('ibl').setup{}
+          require('ibl').setup{
+            indent = { char = '▏' },
+          }
         '';
     }
 

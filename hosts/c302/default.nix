@@ -15,6 +15,8 @@
 
     ../common/optional/desktop.nix
     ../common/optional/touchpad.nix
+    ../common/optional/backlight.nix
+    ../common/optional/battery.nix
 
     ../common/users/cino
   ];
