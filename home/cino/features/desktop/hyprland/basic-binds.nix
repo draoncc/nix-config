@@ -1,30 +1,31 @@
 { lib, ... }:
 let
-  workspaces = (map toString (lib.range 0 9))
-    ++ (map (n: "F${toString n}") (lib.range 1 12));
-  mod = "SUPER";
+  workspaces = (map (n: "F${toString n}") (lib.range 1 12));
+    # ++ (map toString (lib.range 0 9));
+  mod = "ALT";
   keymaps = {
-    q = ";";
-    s = "o";
-    f = "u";
-    minus = "!";
-    equal = "#";
-    g = "i";
-    t = "y";
-    apostrophe = "minus";
-    u = "g";
+    e = "code:26";
+    q = "code:24";
+    s = "code:39";
+    f = "code:41";
+    minus = "code:20";
+    equal = "code:21";
+    g = "code:42";
+    t = "code:28";
+    apostrophe = "code:48";
+    u = "code:30";
   };
 
   # Map keys to hyprland directions
   directions = rec {
-    left = "l";
-    right = "r";
-    up = "u";
-    down = "d";
-    d = left;
-    n = right;
-    t = up;
-    h = down;
+    # left = "l";
+    # right = "r";
+    # up = "u";
+    # down = "d";
+    d = "l"; # left
+    n = "r"; # right
+    t = "u"; # up
+    h = "d"; # down
   };
 in {
   wayland.windowManager.hyprland.settings = {

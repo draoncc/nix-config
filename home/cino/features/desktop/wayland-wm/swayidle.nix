@@ -39,11 +39,11 @@ in {
         resumeCommand = "${pactl} set-source-mute @DEFAULT_SOURCE@ no";
       }) ++
       # Turn off RGB
-      (lib.optionals config.services.rgbdaemon.enable (afterLockTimeout {
-        timeout = 20;
-        command = "systemctl --user stop rgbdaemon";
-        resumeCommand = "systemctl --user start rgbdaemon";
-      })) ++
+      # (lib.optionals config.services.rgbdaemon.enable (afterLockTimeout {
+      #   timeout = 20;
+      #   command = "systemctl --user stop rgbdaemon";
+      #   resumeCommand = "systemctl --user start rgbdaemon";
+      # })) ++
       # Turn off displays (hyprland)
       (lib.optionals config.wayland.windowManager.hyprland.enable
         (afterLockTimeout {

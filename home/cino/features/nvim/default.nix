@@ -3,11 +3,11 @@
 {
   imports = [ ./lsp.nix ./ui.nix ];
 
-  home.sessionVariables.EDITOR = "nvim";
+  # home.sessionVariables.EDITOR = "nvim";
 
   programs.neovim = {
     enable = true;
-    defaultEditor = true;
+    # defaultEditor = true;
     viAlias = true;
 
     withNodeJs = true;
@@ -52,8 +52,8 @@
         vnoremap <Leader>y "+y
 
         " Buffer movement
-        nmap <C-s> :bnext<CR>
-        nmap <C-h> :bprev<CR>
+        nmap <C-n> :bnext<CR>
+        nmap <C-d> :bprev<CR>
         nmap <C-q> :bdel<CR>
       '';
 

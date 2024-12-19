@@ -1,31 +1,32 @@
 { lib, config, pkgs, ... }:
 
 let
-  mod = "SUPER";
+  mod = "ALT";
   keymaps = {
-    q = ";";
-    s = "o";
-    f = "u";
-    minus = "!";
-    equal = "#";
-    g = "i";
-    t = "y";
-    apostrophe = "minus";
-    u = "g";
-    v = "k";
-    b = "x";
-    w = "comma";
-    x = "q";
-    d = "e";
-    semicolon = "s";
-    P = "l";
+    e = "code:26";
+    q = "code:24";
+    s = "code:39";
+    f = "code:41";
+    minus = "code:20";
+    equal = "code:21";
+    g = "code:42";
+    t = "code:28";
+    apostrophe = "code:48";
+    u = "code:30";
+    v = "code:55";
+    b = "code:56";
+    w = "code:25";
+    x = "code:53";
+    d = "code:40";
+    semicolon = "code:47";
+    P = "code:33";
   };
 in {
   imports = [ ./tty-init.nix ./basic-binds.nix ./systemd-fixes.nix ];
 
   home.packages = with pkgs; [
     inputs.hyprwm-contrib.grimblast
-    hyprslurp
+    # hyprslurp
     hyprpicker
   ];
 
@@ -38,17 +39,25 @@ in {
         gaps_in = 15;
         gaps_out = 20;
         border_size = 2.7;
-        cursor_inactive_timeout = 4;
+        # cursor_inactive_timeout = 4;
         "col.active_border" = "0xff${config.colorscheme.colors.base0C}";
         "col.inactive_border" = "0xff${config.colorscheme.colors.base02}";
-        "col.group_border_active" = "0xff${config.colorscheme.colors.base0B}";
-        "col.group_border" = "0xff${config.colorscheme.colors.base04}";
       };
+
+      dwindle = {
+        split_width_multiplier = 1.35;
+        # "col.group_border_active" = "0xff${config.colorscheme.colors.base0B}";
+        # "col.group_border" = "0xff${config.colorscheme.colors.base04}";
+      };
+
       input = {
-        kb_layout = "br,us";
+        kb_layout = "us";
+        kb_variant = "dvp";
+        kb_options =
+          "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
         touchpad.disable_while_typing = false;
       };
-      dwindle.split_width_multiplier = 1.35;
+
       misc.vfr = true;
 
       decoration = {
@@ -73,23 +82,23 @@ in {
       animations = {
         enabled = true;
         bezier = [
-          "easein,0.11, 0, 0.5, 0"
-          "easeout,0.5, 1, 0.89, 1"
+          "easein,0.32, 0, 0.67, 0" # cubic
+          "easeout,0.33, 1, 0.68, 1" # cubic
           "easeinback,0.36, 0, 0.66, -0.56"
           "easeoutback,0.34, 1.56, 0.64, 1"
         ];
 
         animation = [
-          "windowsIn,1,3,easeoutback,slide"
-          "windowsOut,1,3,easeinback,slide"
-          "windowsMove,1,3,easeoutback"
-          "workspaces,1,2,easeoutback,slide"
-          "fadeIn,1,3,easeout"
-          "fadeOut,1,3,easein"
-          "fadeSwitch,1,3,easeout"
-          "fadeShadow,1,3,easeout"
-          "fadeDim,1,3,easeout"
-          "border,1,3,easeout"
+          "windowsIn,1,1,easeout,slide"
+          "windowsOut,1,1,easein,slide"
+          "windowsMove,1,1,easeout"
+          "workspaces,1,2,easeout,slide"
+          "fadeIn,1,1,easeout"
+          "fadeOut,1,1,easein"
+          "fadeSwitch,1,1,easeout"
+          "fadeShadow,1,1,easeout"
+          "fadeDim,1,1,easeout"
+          "border,1,1,easeout"
         ];
       };
 

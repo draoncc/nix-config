@@ -5,7 +5,7 @@
 { config, pkgs, ... }:
 
 {
-  networking.hostName = "c302-nixos";
+  networking.hostName = "c302";
 
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -13,10 +13,13 @@
     ../common
     ../common/disko-config.nix
 
+    ../common/optional/greetd.nix
     ../common/optional/desktop.nix
     ../common/optional/touchpad.nix
     ../common/optional/backlight.nix
     ../common/optional/battery.nix
+    ../common/optional/bluetooth.nix
+    ../common/optional/google-chrome.nix
 
     ../common/users/cino
   ];
@@ -25,25 +28,28 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  # environment.systemPackages = with pkgs; [
-  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #   wget
-  # ];
+  programs = {
+    light.enable = true;
+    adb.enable = true;
+    dconf.enable = true;
+    kdeconnect.enable = true;
+    mtr.enable = true;
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  programs.mtr.enable = true;
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
   };
 
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  xdg.portal = {
+    enable = true;
+    wlr.enable = true;
+  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

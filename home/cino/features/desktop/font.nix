@@ -6,8 +6,8 @@
       package = pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; };
     };
     regular = {
-      family = "JetBrains";
-      package = pkgs.jetbrains;
+      family = "Luciole";
+      package = pkgs.luciole;
     };
   };
 }

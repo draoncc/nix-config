@@ -1,13 +1,13 @@
 { pkgs, ... }: {
   imports = [
-    ./hyprland-vnc.nix
-    ./gammastep.nix
+    # ./hyprland-vnc.nix
+    # ./gammastep.nix
     ./mako.nix
     ./swayidle.nix
     ./swaylock.nix
     ./waybar.nix
     ./wofi.nix
-    ./zathura.nix
+    # ./zathura.nix
   ];
 
   xdg.mimeApps.enable = true;
@@ -16,15 +16,15 @@
     gtk3 # For gtk-launch
     imv
     mimeo
-    primary-xwayland
+    # primary-xwayland
     pulseaudio
     slurp
     waypipe
     wf-recorder
     wl-clipboard
     wl-mirror
-    wl-mirror-pick
-    xdg-utils-spawn-terminal # Patched to open terminal
+    # wl-mirror-pick
+    # xdg-utils-spawn-terminal # Patched to open terminal
     ydotool
   ];
 

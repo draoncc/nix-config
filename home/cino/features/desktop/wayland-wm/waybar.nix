@@ -14,7 +14,7 @@ let
   ping = "${pkgs.iputils}/bin/ping";
 
   jq = "${pkgs.jq}/bin/jq";
-  gamemoded = "${pkgs.gamemode}/bin/gamemoded";
+  # gamemoded = "${pkgs.gamemode}/bin/gamemoded";
   systemctl = "${pkgs.systemd}/bin/systemctl";
   journalctl = "${pkgs.systemd}/bin/journalctl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
@@ -23,66 +23,70 @@ let
   wofi = "${pkgs.wofi}/bin/wofi";
 
   # Function to simplify making waybar outputs
-  jsonOutput = name: { pre ? "", text ? "", tooltip ? "", alt ? "", class ? "", percentage ? "" }: "${pkgs.writeShellScriptBin "waybar-${name}" ''
-    set -euo pipefail
-    ${pre}
-    ${jq} -cn \
-      --arg text "${text}" \
-      --arg tooltip "${tooltip}" \
-      --arg alt "${alt}" \
-      --arg class "${class}" \
-      --arg percentage "${percentage}" \
-      '{text:$text,tooltip:$tooltip,alt:$alt,class:$class,percentage:$percentage}'
-  ''}/bin/waybar-${name}";
-in
-{
+  jsonOutput = name:
+    { pre ? "", text ? "", tooltip ? "", alt ? "", class ? "", percentage ? ""
+    }:
+    "${
+      pkgs.writeShellScriptBin "waybar-${name}" ''
+        set -euo pipefail
+        ${pre}
+        ${jq} -cn \
+          --arg text "${text}" \
+          --arg tooltip "${tooltip}" \
+          --arg alt "${alt}" \
+          --arg class "${class}" \
+          --arg percentage "${percentage}" \
+          '{text:$text,tooltip:$tooltip,alt:$alt,class:$class,percentage:$percentage}'
+      ''
+    }/bin/waybar-${name}";
+in {
   programs.waybar = {
     enable = true;
     package = pkgs.waybar.overrideAttrs (oa: {
-      mesonFlags = (oa.mesonFlags or  [ ]) ++ [ "-Dexperimental=true" ];
+      mesonFlags = (oa.mesonFlags or [ ]) ++ [ "-Dexperimental=true" ];
     });
     systemd.enable = true;
     settings = {
       primary = {
-        mode = "dock";
+        mode = "overlay";
         layer = "top";
         height = 40;
-        margin = "6";
-        position = "top";
+        margin = "10";
+        position = "bottom";
         modules-left = [
-          "custom/menu"
-        ] ++ (lib.optionals config.wayland.windowManager.sway.enable [
-          "sway/workspaces"
-          "sway/mode"
-        ]) ++ (lib.optionals config.wayland.windowManager.hyprland.enable [
-          "hyprland/workspaces"
-          "hyprland/submap"
-        ]) ++ [
-          "custom/currentplayer"
-          "custom/player"
+          # "custom/menu"
+          # ] ++ (lib.optionals config.wayland.windowManager.sway.enable [
+          #   "sway/workspaces"
+          #   "sway/mode"
+          # ]) ++ (lib.optionals config.wayland.windowManager.hyprland.enable [
+          #   "hyprland/workspaces"
+          #   "hyprland/submap"
+          # ]) ++ [
+          # "custom/currentplayer"
+          # "custom/player"
         ];
 
         modules-center = [
-          "pulseaudio"
-          "battery"
-          "clock"
-          "custom/unread-mail"
-          "custom/gpg-agent"
+          # "pulseaudio"
+          # "clock"
+          # "custom/unread-mail"
+          # "custom/gpg-agent"
         ];
 
         modules-right = [
-          "network"
-          "custom/tailscale-ping"
-          "custom/gamemode"
+          "battery"
+          # "network"
+          # "custom/tailscale-ping"
+          # "custom/gamemode"
           # TODO: currently broken for some reason
           # "custom/gammastep"
-          "tray"
-          "custom/hostname"
+          # "tray"
+          # "custom/hostname"
         ];
 
         clock = {
           interval = 1;
-          format = "{:%d/%m %H:%M:%S}";
+          format = "{:%H:%M}"; # "{:%d/%m %H:%M:%S}";
           format-alt = "{:%Y-%m-%d %H:%M:%S %z}";
           on-click-left = "mode";
           tooltip-format = ''
@@ -111,13 +115,15 @@ in
           bat = "BAT0";
           interval = 10;
           format-icons = [ "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹" ];
-          format = "{icon} {capacity}%";
+          format = "{icon}"; # "{icon} {capacity}%";
           format-charging = "󰂄 {capacity}%";
           onclick = "";
+          states = {
+            warning = 30;
+            critical = 10;
+          };
         };
-        "sway/window" = {
-          max-length = 20;
-        };
+        "sway/window" = { max-length = 20; };
         network = {
           interval = 3;
           format-wifi = "   {essid}";
@@ -130,95 +136,93 @@ in
             Down: {bandwidthDownBits}'';
           on-click = "";
         };
-        "custom/tailscale-ping" = {
-          interval = 10;
-          return-type = "json";
-          exec =
-            let
-              inherit (builtins) concatStringsSep attrNames;
-              hosts = attrNames outputs.nixosConfigurations;
-              homeMachine = "merope";
-              remoteMachine = "alcyone";
-            in
-            jsonOutput "tailscale-ping" {
-              # Build variables for each host
-              pre = ''
-                set -o pipefail
-                ${concatStringsSep "\n" (map (host: ''
-                  ping_${host}="$(${timeout} 2 ${ping} -c 1 -q ${host} 2>/dev/null | ${tail} -1 | ${cut} -d '/' -f5 | ${cut} -d '.' -f1)ms" || ping_${host}="Disconnected"
-                '') hosts)}
-              '';
-              # Access a remote machine's and a home machine's ping
-              text = "  $ping_${remoteMachine} /  $ping_${homeMachine}";
-              # Show pings from all machines
-              tooltip = concatStringsSep "\n" (map (host: "${host}: $ping_${host}") hosts);
-            };
-          format = "{}";
-          on-click = "";
-        };
+        # "custom/tailscale-ping" = {
+        #   interval = 10;
+        #   return-type = "json";
+        #   exec = let
+        #     inherit (builtins) concatStringsSep attrNames;
+        #     hosts = attrNames outputs.nixosConfigurations;
+        #     homeMachine = "merope";
+        #     remoteMachine = "alcyone";
+        #   in jsonOutput "tailscale-ping" {
+        #     # Build variables for each host
+        #     pre = ''
+        #       set -o pipefail
+        #       ${concatStringsSep "\n" (map (host: ''
+        #         ping_${host}="$(${timeout} 2 ${ping} -c 1 -q ${host} 2>/dev/null | ${tail} -1 | ${cut} -d '/' -f5 | ${cut} -d '.' -f1)ms" || ping_${host}="Disconnected"
+        #       '') hosts)}
+        #     '';
+        #     # Access a remote machine's and a home machine's ping
+        #     text = "  $ping_${remoteMachine} /  $ping_${homeMachine}";
+        #     # Show pings from all machines
+        #     tooltip = concatStringsSep "\n"
+        #       (map (host: "${host}: $ping_${host}") hosts);
+        #   };
+        #   format = "{}";
+        #   on-click = "";
+        # };
         "custom/menu" = {
           return-type = "json";
           exec = jsonOutput "menu" {
             text = "";
-            tooltip = ''$(${cat} /etc/os-release | ${grep} PRETTY_NAME | ${cut} -d '"' -f2)'';
+            tooltip = ''
+              $(${cat} /etc/os-release | ${grep} PRETTY_NAME | ${cut} -d '"' -f2)'';
           };
           on-click = "${wofi} -S drun -x 10 -y 10 -W 25% -H 60%";
         };
-        "custom/hostname" = {
-          exec = "echo $USER@$HOSTNAME";
-        };
-        "custom/unread-mail" = {
-          interval = 5;
-          return-type = "json";
-          exec = jsonOutput "unread-mail" {
-            pre = ''
-              count=$(${find} ~/Mail/*/Inbox/new -type f | ${wc} -l)
-              if ${pgrep} mbsync &>/dev/null; then
-                status="syncing"
-              else if [ "$count" == "0" ]; then
-                status="read"
-              else
-                status="unread"
-              fi
-              fi
-            '';
-            text = "$count";
-            alt = "$status";
-          };
-          format = "{icon}  ({})";
-          format-icons = {
-            "read" = "󰇯";
-            "unread" = "󰇮";
-            "syncing" = "󰁪";
-          };
-        };
-        "custom/gpg-agent" = {
-          interval = 2;
-          return-type = "json";
-          exec =
-            let gpgCmds = import ../../../cli/gpg-commands.nix { inherit pkgs; };
-            in
-            jsonOutput "gpg-agent" {
-              pre = ''status=$(${gpgCmds.isUnlocked} && echo "unlocked" || echo "locked")'';
-              alt = "$status";
-              tooltip = "GPG is $status";
-            };
-          format = "{icon}";
-          format-icons = {
-            "locked" = "";
-            "unlocked" = "";
-          };
-          on-click = "";
-        };
-        "custom/gamemode" = {
-          exec-if = "${gamemoded} --status | ${grep} 'is active' -q";
-          interval = 2;
-          return-type = "json";
-          exec = jsonOutput "gamemode" {
-            tooltip = "Gamemode is active";
-          };
-          format = " ";
-        };
+        "custom/hostname" = { exec = "echo $USER@$HOSTNAME"; };
+        # "custom/unread-mail" = {
+        #   interval = 5;
+        #   return-type = "json";
+        #   exec = jsonOutput "unread-mail" {
+        #     pre = ''
+        #       count=$(${find} ~/Mail/*/Inbox/new -type f | ${wc} -l)
+        #       if ${pgrep} mbsync &>/dev/null; then
+        #         status="syncing"
+        #       else if [ "$count" == "0" ]; then
+        #         status="read"
+        #       else
+        #         status="unread"
+        #       fi
+        #       fi
+        #     '';
+        #     text = "$count";
+        #     alt = "$status";
+        #   };
+        #   format = "{icon}  ({})";
+        #   format-icons = {
+        #     "read" = "󰇯";
+        #     "unread" = "󰇮";
+        #     "syncing" = "󰁪";
+        #   };
+        # };
+        # TODO: re-enable
+        #
+        # "custom/gpg-agent" = {
+        #   interval = 2;
+        #   return-type = "json";
+        #   exec =
+        #     let gpgCmds = import ../../../cli/gpg-commands.nix { inherit pkgs; };
+        #     in
+        #     jsonOutput "gpg-agent" {
+        #       pre = ''status=$(${gpgCmds.isUnlocked} && echo "unlocked" || echo "locked")'';
+        #       alt = "$status";
+        #       tooltip = "GPG is $status";
+        #     };
+        #   format = "{icon}";
+        #   format-icons = {
+        #     "locked" = "";
+        #     "unlocked" = "";
+        #   };
+        #   on-click = "";
+        # };
+        # "custom/gamemode" = {
+        #   exec-if = "${gamemoded} --status | ${grep} 'is active' -q";
+        #   interval = 2;
+        #   return-type = "json";
+        #   exec = jsonOutput "gamemode" { tooltip = "Gamemode is active"; };
+        #   format = " ";
+        # };
         "custom/gammastep" = {
           interval = 5;
           return-type = "json";
@@ -247,7 +251,8 @@ in
             "active (Transition (Day)" = " ";
             "active (Transition (Daytime)" = " ";
           };
-          on-click = "${systemctl} --user is-active gammastep && ${systemctl} --user stop gammastep || ${systemctl} --user start gammastep";
+          on-click =
+            "${systemctl} --user is-active gammastep && ${systemctl} --user stop gammastep || ${systemctl} --user start gammastep";
         };
         "custom/currentplayer" = {
           interval = 2;
@@ -284,7 +289,8 @@ in
         };
         "custom/player" = {
           exec-if = "${playerctl} status";
-          exec = ''${playerctl} metadata --format '{"text": "{{title}} - {{artist}}", "alt": "{{status}}", "tooltip": "{{title}} - {{artist}} ({{album}})"}' '';
+          exec = ''
+            ${playerctl} metadata --format '{"text": "{{title}} - {{artist}}", "alt": "{{status}}", "tooltip": "{{title}} - {{artist}} ({{album}})"}' '';
           return-type = "json";
           interval = 2;
           max-length = 30;
@@ -304,11 +310,16 @@ in
     # x y -> vertical, horizontal
     # x y z -> top, horizontal, bottom
     # w x y z -> top, right, bottom, left
-    style = let inherit (config.colorscheme) colors; in /* css */ ''
+    style = let
+      inherit (config.colorscheme) colors;
+      # css
+    in ''
       * {
         font-family: ${config.fontProfiles.regular.family}, ${config.fontProfiles.monospace.family};
         font-size: 12pt;
+        min-width: 24px;
         padding: 0 8px;
+        border-radius: 24px;
       }
 
       .modules-right {
@@ -320,21 +331,21 @@ in
       }
 
       window#waybar.top {
-        opacity: 0.95;
+        opacity: 0.90;
         padding: 0;
-        background-color: #${colors.base00};
-        border: 2px solid #${colors.base0C};
-        border-radius: 10px;
       }
       window#waybar.bottom {
-        opacity: 0.90;
-        background-color: #${colors.base00};
-        border: 2px solid #${colors.base0C};
-        border-radius: 10px;
+        opacity: 0.95;
       }
 
       window#waybar {
         color: #${colors.base05};
+        background-color: rgba(0, 0, 0, 0);
+        /* background-color: #${colors.base00}; */
+        /* border-width: 2px; */
+        border-style: solid;
+        border-color: #${colors.base0C};
+        /* border-radius: 10px; */
       }
 
       #workspaces button {
@@ -342,6 +353,7 @@ in
         color: #${colors.base05};
         padding: 5px 1px;
         margin: 3px 0;
+        border-radius: 10px;
       }
       #workspaces button.hidden {
         background-color: #${colors.base00};
@@ -354,13 +366,12 @@ in
       }
 
       #clock {
-        background-color: #${colors.base0C};
-        color: #${colors.base00};
-        padding-left: 15px;
+        background-color: #${colors.base00};
+        /* padding-left: 15px;
         padding-right: 15px;
         margin-top: 0;
         margin-bottom: 0;
-        border-radius: 10px;
+        border-radius: 10px; */
       }
 
       #custom-menu {
@@ -369,7 +380,7 @@ in
         padding-left: 15px;
         padding-right: 22px;
         margin: 0;
-        border-radius: 10px;
+        /* border-radius: 10px; */
       }
       #custom-hostname {
         background-color: #${colors.base0C};
@@ -379,11 +390,28 @@ in
         margin-right: 0;
         margin-top: 0;
         margin-bottom: 0;
-        border-radius: 10px;
+        /* border-radius: 10px; */
       }
       #custom-currentplayer {
         padding-right: 0;
       }
+
+      #battery {
+        background: #${colors.base00};
+        transition: color 0.5s ease-in;
+      }
+      #battery.warning {
+        color: #${colors.base0A};
+      }
+      #battery.critical {
+        animation: flashing 0.5s infinite ease-in-out;
+      }
+      @keyframes flashing {
+        0% { color: #${colors.base0F}; }
+        50% { color: #${colors.base05}; }
+        100% { color: #${colors.base0F}; }
+      }
+
       #tray {
         color: #${colors.base05};
       }
