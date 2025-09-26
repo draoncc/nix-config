@@ -3,7 +3,6 @@
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    inputs.disko.nixosModules.disko
     ./zsh.nix
   ];
 
@@ -32,11 +31,11 @@
     useXkbConfig = true; # use xkbOptions in tty.
   };
 
-  services.xserver = {
+  services.xserver.xkb = {
     # Configure keymap in X11
     layout = "us";
-    xkbVariant = "dvp";
-    xkbOptions =
+    variant = "dvp";
+    options =
       "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
   };
 }

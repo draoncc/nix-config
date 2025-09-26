@@ -5,53 +5,44 @@
 { inputs, outputs, config, pkgs, ... }:
 
 {
-  networking.hostName = "c302";
+  networking.hostName = "wsl";
 
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
 
+    inputs.nixos-wsl.nixosModules.default
+
     ../common
-
-    inputs.disko.nixosModules.disko
-    ../common/disko-config.nix
-
-    ../common/optional/greetd.nix
-    ../common/optional/desktop.nix
-    ../common/optional/touchpad.nix
-    ../common/optional/backlight.nix
-    ../common/optional/battery.nix
-    ../common/optional/bluetooth.nix
-    ../common/optional/google-chrome.nix
 
     ../common/users/cino
   ];
 
+  wsl.enable = true;
+  wsl.defaultUser = "cino";
+
   # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  # boot.loader.systemd-boot.enable = true;
+  # boot.loader.efi.canTouchEfiVariables = true;
 
-  programs = {
-    light.enable = true;
-    adb.enable = true;
-    dconf.enable = true;
-    kdeconnect.enable = true;
-    mtr.enable = true;
+  # List packages installed in system profile. To search, run:
+  # $ nix search wget
+  # environment.systemPackages = with pkgs; [
+  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  #   wget
+  # ];
 
-    gnupg.agent = {
-      enable = true;
-      enableSSHSupport = true;
-    };
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  programs.mtr.enable = true;
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
   };
 
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-
-  xdg.portal = {
-    enable = true;
-    wlr.enable = true;
-  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -65,6 +56,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = "25.05"; # Did you read the comment?
 
 }

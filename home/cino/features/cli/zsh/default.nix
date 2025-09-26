@@ -1,7 +1,7 @@
-{ lib, ... }:
+{ lib, config, ... }:
 
 {
-  programs.thefuck.enable = true;
+  programs.pay-respects.enable = true;
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
@@ -10,11 +10,11 @@
   programs.zsh = {
     enable = true;
 
-    dotDir = ".config/zsh";
+    dotDir = "${config.home.homeDirectory}/.config/zsh";
     autocd = true;
     defaultKeymap = "viins";
     enableCompletion = true;
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
 
     shellAliases = {
       p = "gopass";
@@ -24,7 +24,7 @@
       tar-gz = "tar -xvzf";
     };
 
-    initExtra = builtins.concatStringsSep "\n" [
+    initContent = builtins.concatStringsSep "\n" [
       # Fix "widgets can only be called when zle is active" on jump
       # https://github.com/ohmyzsh/ohmyzsh/issues/3620#issuecomment-75435240
       ''

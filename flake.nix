@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     impermanence.url = "github:nix-community/impermanence";
 
     nix-colors.url = "github:misterio77/nix-colors";
@@ -30,7 +31,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, nixos-wsl, home-manager, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
@@ -58,11 +59,24 @@
           modules = [ ./hosts/c302 { _module.args.disk = "/dev/mmcblk0"; } ];
           specialArgs = { inherit inputs outputs; };
         };
+
+        # WSL
+        wsl = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./hosts/wsl ];
+          specialArgs = { inherit inputs outputs; };
+        };
       };
 
       homeConfigurations = {
         "cino@c302" = lib.homeManagerConfiguration {
           modules = [ ./home/cino/c302.nix ];
+          pkgs = pkgsFor.x86_64-linux;
+          extraSpecialArgs = { inherit inputs outputs; };
+        };
+
+        "cino@wsl" = lib.homeManagerConfiguration {
+          modules = [ ./home/cino/wsl.nix ];
           pkgs = pkgsFor.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
         };

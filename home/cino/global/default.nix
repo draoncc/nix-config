@@ -5,7 +5,7 @@
     inputs.impermanence.nixosModules.home-manager.impermanence
     inputs.nix-colors.homeManagerModule
     ../features/cli
-    ../features/nvim
+    # ../features/nvim
   ] ++ (builtins.attrValues outputs.homeManagerModules);
 
   nixpkgs = {
@@ -19,7 +19,7 @@
   nix = {
     package = lib.mkDefault pkgs.nix;
     settings = {
-      experimental-features = [ "nix-command" "flakes" "repl-flake" ];
+      experimental-features = [ "nix-command" "flakes" ];
       warn-dirty = false;
     };
   };
@@ -34,14 +34,14 @@
   home = {
     username = lib.mkDefault "cino";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
-    stateVersion = lib.mkDefault "23.05";
+    stateVersion = lib.mkDefault "25.05";
     sessionPath = [ "$HOME/.local/bin" ];
     sessionVariables = { FLAKE = "$HOME/Documents/NixConfig"; };
 
     persistence = {
       "/home/${config.home.username}" = {
         directories =
-          [ "Documents" "Downloads" "Pictures" "Videos" ".local/bin" ];
+          [ "Documents" "Downloads" "Pictures" "Videos" ".local/bin" "nix-config" ];
         allowOther = true;
       };
     };
