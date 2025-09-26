@@ -51,7 +51,7 @@
 
     oh-my-zsh = {
       enable = true;
-      plugins = [ "z" "git" "terraform" ];
+      plugins = [ "z" "git" "gh" "terraform" ];
     };
   };
 }
