@@ -15,7 +15,7 @@
     jq # JSON pretty printer and manipulator
     silver-searcher # Search file contents
 
-    nil # Nix LSP
+    nixd # Nix LSP
     nixfmt # Nix formatter
 
     ltex-ls # Spell checking LSP
