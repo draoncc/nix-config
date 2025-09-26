@@ -1,7 +1,13 @@
 { pkgs, inputs, ... }:
 
 {
-  imports = [ ./zsh ./direnv.nix ./starship.nix ./git.nix ];
+  imports = [
+    ./zsh
+    ./direnv.nix
+    ./starship.nix
+    ./git.nix
+    ./github.nix
+  ];
 
   home.packages = with pkgs; [
     comma # Install and run programs by sticking a , before them
