@@ -71,10 +71,7 @@
       nixosConfigurations = {
         # Asus Chromebook
         c302 = lib.nixosSystem {
-          modules = [
-            ./hosts/c302
-            { _module.args.disk = "/dev/mmcblk0"; }
-          ];
+          modules = [ ./hosts/c302 { _module.args.disk = "/dev/mmcblk0"; } ];
           specialArgs = { inherit inputs outputs; };
         };
 
