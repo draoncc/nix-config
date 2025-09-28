@@ -15,6 +15,7 @@
   home.packages = with pkgs; [
     jq # JSON pretty printer and manipulator
     silver-searcher # Search file contents
+    just # Handy way to save and run project-specific commands
 
     nixd # Nix LSP
     nixfmt # Nix formatter
