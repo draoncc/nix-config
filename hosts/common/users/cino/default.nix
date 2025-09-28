@@ -11,10 +11,6 @@
     extraGroups = [ "wheel" "video" "audio" ]; # Enable ‘sudo’ for the user.
     hashedPassword =
       "$6$zSPBGBvubSamHDYf$ElvGr0CmeCt7uO5YMxdLgizoX/nZr/PUyjpI1uZEGzkhLgDuVv6Sy/HRr9oC9mpqAjw.bIhOEc2mFQDIbc7Hw1";
-    #   packages = with pkgs; [
-    #     firefox
-    #     tree
-    #   ];
   };
 
   home-manager.users.cino =

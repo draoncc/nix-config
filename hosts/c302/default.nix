@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ inputs, outputs, config, pkgs, ... }:
+{ inputs, ... }:
 
 {
   networking.hostName = "c302";
@@ -15,6 +15,8 @@
     inputs.disko.nixosModules.disko
     ../common/disko-config.nix
 
+    ../common/optional/networkmanager.nix
+    ../common/optional/sound.nix
     ../common/optional/greetd.nix
     ../common/optional/desktop.nix
     ../common/optional/touchpad.nix

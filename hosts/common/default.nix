@@ -35,7 +35,6 @@
     # Configure keymap in X11
     layout = "us";
     variant = "dvp";
-    options =
-      "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
+    options = "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
   };
 }
