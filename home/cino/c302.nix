@@ -3,7 +3,6 @@
 {
   imports = [
     ./global
-    ./features/cli/helix
     ./features/desktop
     ./features/desktop/optional/telegram.nix
   ];

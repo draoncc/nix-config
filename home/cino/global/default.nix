@@ -26,10 +26,7 @@
 
   systemd.user.startServices = "sd-switch";
 
-  programs = {
-    home-manager.enable = true;
-    git.enable = true;
-  };
+  programs.home-manager.enable = true;
 
   home = {
     username = lib.mkDefault "cino";

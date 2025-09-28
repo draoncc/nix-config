@@ -3,6 +3,7 @@
 {
   imports = [
     ./zsh
+    ./helix
     ./direnv.nix
     ./starship.nix
     ./git.nix
@@ -22,4 +23,6 @@
 
     inputs.nh.packages.x86_64-linux.default # nixos-rebuild and home-manager cli wrapper
   ];
+
+  programs.pay-respects.enable = true;
 }

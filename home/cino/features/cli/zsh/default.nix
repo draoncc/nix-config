@@ -1,7 +1,6 @@
 { lib, config, ... }:
 
 {
-  programs.pay-respects.enable = true;
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
