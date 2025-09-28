@@ -29,20 +29,35 @@
       url = "github:hyprwm/contrib";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, nixos-wsl, home-manager, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixos-wsl,
+      home-manager,
+      nix-index-database,
+      ...
+    }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
       systems = [ "x86_64-linux" ];
       forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
-      pkgsFor = lib.genAttrs systems (system:
+      pkgsFor = lib.genAttrs systems (
+        system:
         import nixpkgs {
           inherit system;
           config.allowUnfree = true;
-        });
-    in {
+        }
+      );
+    in
+    {
       inherit lib;
       homeManagerModules = import ./modules/home-manager;
 
@@ -56,7 +71,10 @@
       nixosConfigurations = {
         # Asus Chromebook
         c302 = lib.nixosSystem {
-          modules = [ ./hosts/c302 { _module.args.disk = "/dev/mmcblk0"; } ];
+          modules = [
+            ./hosts/c302
+            { _module.args.disk = "/dev/mmcblk0"; }
+          ];
           specialArgs = { inherit inputs outputs; };
         };
 
@@ -68,18 +86,12 @@
         };
       };
 
-      homeConfigurations = {
-        "cino@c302" = lib.homeManagerConfiguration {
-          modules = [ ./home/cino/c302.nix ];
-          pkgs = pkgsFor.x86_64-linux;
-          extraSpecialArgs = { inherit inputs outputs; };
-        };
-
-        "cino@wsl" = lib.homeManagerConfiguration {
-          modules = [ ./home/cino/wsl.nix ];
-          pkgs = pkgsFor.x86_64-linux;
-          extraSpecialArgs = { inherit inputs outputs; };
-        };
-      };
+      # homeConfigurations = {
+      #   "cino@c302" = lib.homeManagerConfiguration {
+      #     modules = [ ./home/cino/c302.nix ];
+      #     pkgs = pkgsFor.x86_64-linux;
+      #     extraSpecialArgs = { inherit inputs outputs; };
+      #   };
+      # };
     };
 }

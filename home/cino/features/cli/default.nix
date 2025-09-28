@@ -9,11 +9,10 @@
     ./starship.nix
     ./git.nix
     ./github.nix
+    ./nix-index.nix
   ];
 
   home.packages = with pkgs; [
-    comma # Install and run programs by sticking a , before them
-
     jq # JSON pretty printer and manipulator
     silver-searcher # Search file contents
 

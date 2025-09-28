@@ -5,6 +5,7 @@
     enable = true;
     enableZshIntegration = true;
   };
+  programs.nix-index.enableZshIntegration = true;
 
   programs.zsh = {
     enable = true;
