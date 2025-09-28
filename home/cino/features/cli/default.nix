@@ -4,6 +4,7 @@
   imports = [
     ./zsh
     ./helix
+    # ./nvim
     ./direnv.nix
     ./starship.nix
     ./git.nix
