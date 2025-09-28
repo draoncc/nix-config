@@ -1,10 +1,13 @@
+alias fmt := format
+alias fmt-all := format-all
+
 host := `uname -a`
 hostname := `hostname`
 
-fmt FILE:
+format FILE:
     nixfmt {{FILE}}
 
-fmt-all:
+format-all:
     for file in $(find . -name '*.nix'); do nixfmt $file; done
 
 test:
