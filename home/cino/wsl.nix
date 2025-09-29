@@ -6,5 +6,5 @@
     ./features/cli/helix
   ];
 
-  colorscheme = inputs.nix-colors.colorschemes.material;
+  colorscheme = inputs.nix-colors.colorschemes.material-darker;
 }

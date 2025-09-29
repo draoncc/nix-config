@@ -7,7 +7,7 @@
     ./features/desktop/optional/telegram.nix
   ];
 
-  colorscheme = inputs.nix-colors.colorschemes.material;
+  colorscheme = inputs.nix-colors.colorschemes.material-darker;
 
   monitors = [{
     name = "eDP-1";
