@@ -8,7 +8,7 @@ in {
     defaultEditor = true;
 
     settings = {
-      theme = "custom-${colorscheme.slug}";
+      theme = "${builtins.replaceStrings ["-"] ["_"] colorscheme.slug}";
 
       editor = {
         color-modes = true;
@@ -23,7 +23,5 @@ in {
         };
       };
     };
-
-    themes = import ./theme.nix { inherit colorscheme; };
   };
 }

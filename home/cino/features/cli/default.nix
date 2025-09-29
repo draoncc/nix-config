@@ -3,7 +3,7 @@
 {
   imports = [
     ./zsh
-    ./helix
+    ./helix.nix
     # ./nvim
     ./direnv.nix
     ./starship.nix
