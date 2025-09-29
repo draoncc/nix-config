@@ -8,7 +8,7 @@ in {
     defaultEditor = true;
 
     settings = {
-      theme = "${colorscheme.slug}";
+      theme = "custom-${colorscheme.slug}";
 
       editor = {
         color-modes = true;

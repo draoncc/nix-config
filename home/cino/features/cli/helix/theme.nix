@@ -1,5 +1,5 @@
 { colorscheme }: {
-  "${colorscheme.slug}" = {
+  "custom-${colorscheme.slug}" = {
     palette = builtins.mapAttrs (name: value: "#${value}")
       colorscheme.palette; # Add leading '#'
     "attributes" = "base09";
