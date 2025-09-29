@@ -14,6 +14,7 @@ in {
         color-modes = true;
         bufferline = "multiple";
         line-number = "relative";
+        default-line-ending = "lf";
         indent-guides.render = true;
         cursor-shape = {
           normal = "block";
