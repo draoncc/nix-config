@@ -1,7 +1,7 @@
 { colorscheme }: {
   "${colorscheme.slug}" = {
     palette = builtins.mapAttrs (name: value: "#${value}")
-      colorscheme.colors; # Add leading '#'
+      colorscheme.palette; # Add leading '#'
     "attributes" = "base09";
     "comment" = {
       fg = "base03";
