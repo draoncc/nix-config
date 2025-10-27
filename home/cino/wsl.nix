@@ -3,7 +3,7 @@
 {
   imports = [
     ./global
-    ./features/cli/helix
+    ./features/cli/helix.nix
   ];
 
   colorscheme = inputs.nix-colors.colorschemes.material-darker;
