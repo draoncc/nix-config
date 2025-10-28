@@ -3,6 +3,7 @@
 {
   imports = [
     ./global
+    ./features/cli
     ./features/desktop
     ./features/desktop/optional/telegram.nix
   ];
