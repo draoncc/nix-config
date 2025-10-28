@@ -17,6 +17,8 @@
     silver-searcher # Search file contents
     just # Handy way to save and run project-specific commands
 
+    unzip
+
     nixd # Nix LSP
     nixfmt # Nix formatter
 
