@@ -5,6 +5,7 @@
     ./global
     ./features/cli
     ./features/cli/optional/godot.nix
+    ./features/cli/optional/gmailctl.nix
     ./features/lang
   ];
 
