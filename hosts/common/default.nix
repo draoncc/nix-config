@@ -4,6 +4,7 @@
   imports = [
     inputs.home-manager.nixosModules.home-manager
     ./zsh.nix
+    ./podman.nix
   ];
 
   programs.fuse.userAllowOther = true;
