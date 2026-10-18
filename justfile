@@ -15,3 +15,6 @@ test:
 
 build:
     sudo nixos-rebuild --flake .#{{hostname}} switch
+
+upgrade:
+    sudo nixos-rebuild --flake .#{{hostname}} switch --upgrade
