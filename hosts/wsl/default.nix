@@ -15,6 +15,7 @@
     ../common
 
     ../common/optional/desktop.nix
+    ../common/optional/docker.nix
 
     ../common/users/cino
   ];

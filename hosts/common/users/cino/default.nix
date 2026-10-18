@@ -8,7 +8,7 @@
   users.users.cino = {
     isNormalUser = true;
     shell = pkgs.zsh;
-    extraGroups = [ "wheel" "video" "audio" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "video" "audio" "docker" ]; # Enable ‘sudo’ for the user.
     hashedPassword =
       "$6$zSPBGBvubSamHDYf$ElvGr0CmeCt7uO5YMxdLgizoX/nZr/PUyjpI1uZEGzkhLgDuVv6Sy/HRr9oC9mpqAjw.bIhOEc2mFQDIbc7Hw1";
   };
