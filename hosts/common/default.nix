@@ -3,6 +3,7 @@
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
+    ./optin-persistence.nix
     ./zsh.nix
     ./podman.nix
   ];

@@ -14,7 +14,7 @@
 
   home.packages = with pkgs; [
     jq # JSON pretty printer and manipulator
-    silver-searcher # Search file contents
+    silver-searcher-ng # Search file contents
     just # Handy way to save and run project-specific commands
 
     unzip

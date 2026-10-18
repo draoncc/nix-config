@@ -1,9 +1,9 @@
-{ inputs, lib, pkgs, config, outputs, ... }:
+{ inputs, lib, config, outputs, ... }:
 
 {
   imports = [
-    inputs.impermanence.nixosModules.home-manager.impermanence
     inputs.nix-colors.homeManagerModule
+    ./nix.nix
   ] ++ (builtins.attrValues outputs.homeManagerModules);
 
   nixpkgs = {
@@ -11,14 +11,6 @@
     config = {
       allowUnfree = true;
       allowUnfreePredicate = (_: true);
-    };
-  };
-
-  nix = {
-    package = lib.mkDefault pkgs.nix;
-    settings = {
-      experimental-features = [ "nix-command" "flakes" ];
-      warn-dirty = false;
     };
   };
 
@@ -37,11 +29,15 @@
     preferXdgDirectories = true;
 
     persistence = {
-      "/home/${config.home.username}" = {
-        directories =
-          [ "Documents" "Downloads" "Pictures" "Videos" ".local/bin" "nix-config" ];
-        allowOther = true;
-      };
+      "/persist".directories = [
+        "Documents"
+        "Downloads"
+        "Pictures"
+        "Videos"
+        "Code"
+        ".local/bin"
+        "nix-config"
+      ];
     };
   };
 }

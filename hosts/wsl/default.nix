@@ -9,6 +9,7 @@
 
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ./fix-user-runtime-dir.nix
 
     inputs.nixos-wsl.nixosModules.default
 
