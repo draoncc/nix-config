@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
 
     nix-colors.url = "github:misterio77/nix-colors";
 
@@ -86,6 +87,13 @@
         wsl = lib.nixosSystem {
           system = "x86_64-linux";
           modules = [ ./hosts/wsl ];
+          specialArgs = { inherit inputs outputs; };
+        };
+
+        # Lenovo Yoga
+        yoga530 = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./hosts/yoga530 ];
           specialArgs = { inherit inputs outputs; };
         };
       };
