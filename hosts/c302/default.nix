@@ -10,7 +10,7 @@
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
 
-    ../common
+    ../common/global
 
     inputs.disko.nixosModules.disko
     ../common/disko-config.nix

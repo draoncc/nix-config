@@ -6,6 +6,7 @@
     ./optin-persistence.nix
     ./zsh.nix
     ./podman.nix
+    ./proton-pass-cli.nix
   ];
 
   programs.fuse.userAllowOther = true;

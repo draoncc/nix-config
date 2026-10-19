@@ -13,7 +13,7 @@
 
     inputs.nixos-wsl.nixosModules.default
 
-    ../common
+    ../common/global
 
     ../common/optional/desktop.nix
     ../common/optional/docker.nix
