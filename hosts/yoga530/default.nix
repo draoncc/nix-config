@@ -11,6 +11,7 @@
     inputs.disko.nixosModules.disko
     ../common/disko-config.nix
 
+    ../common/optional/ephemeral-btrfs.nix
     ../common/optional/networkmanager.nix
     ../common/optional/sound.nix
     ../common/optional/greetd.nix
@@ -22,6 +23,7 @@
     ../common/optional/google-chrome.nix
     ../common/optional/docker.nix
     ../common/optional/proton-pass.nix
+    ../common/optional/android-tools.nix
 
     ../common/users/cino
   ];
@@ -33,8 +35,6 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   programs = {
-    light.enable = true;
-    adb.enable = true;
     dconf.enable = true;
     kdeconnect.enable = true;
     mtr.enable = true;
@@ -49,11 +49,6 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-
-  xdg.portal = {
-    enable = true;
-    wlr.enable = true;
-  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

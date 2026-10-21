@@ -10,4 +10,6 @@
 
     ./hyprland
   ];
+
+  xdg.portal.enable = true;
 }

@@ -24,6 +24,7 @@
     ../common/optional/battery.nix
     ../common/optional/bluetooth.nix
     ../common/optional/google-chrome.nix
+    ../common/optional/android-tools.nix
 
     ../common/users/cino
   ];
@@ -33,8 +34,6 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   programs = {
-    light.enable = true;
-    adb.enable = true;
     dconf.enable = true;
     kdeconnect.enable = true;
     mtr.enable = true;
@@ -49,11 +48,6 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-
-  xdg.portal = {
-    enable = true;
-    wlr.enable = true;
-  };
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

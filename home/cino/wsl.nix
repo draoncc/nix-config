@@ -3,7 +3,7 @@
 {
   imports = [
     ./global
-    ./features/cli
+    ./features/cli/common
     ./features/cli/optional/godot.nix
     ./features/cli/optional/gmailctl.nix
     ./features/lang

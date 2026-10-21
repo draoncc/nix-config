@@ -64,13 +64,13 @@
 
       # Extra language servers
       terraform-lsp
-      nodePackages.typescript
-      nodePackages.typescript-language-server
+      typescript
+      typescript-language-server
       gopls
 
       # Linters
-      nodePackages.prettier
-      nodePackages.eslint
+      prettier
+      eslint
     ];
 
     plugins = with pkgs.vimPlugins; [

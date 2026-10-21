@@ -55,7 +55,15 @@
     }@inputs:
     let
       inherit (self) outputs;
-      lib = nixpkgs.lib // home-manager.lib;
+      lib = let
+        base = nixpkgs.lib // home-manager.lib;
+      in base // {
+        toSystemdDevice = device:
+          base.concatStringsSep "-" (
+            base.tail (map (base.replaceString "-" "\\x2d") (base.splitString "/" device))
+          )
+          + ".device";
+      };
       systems = [ "x86_64-linux" ];
       forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
       pkgsFor = lib.genAttrs systems (
@@ -93,7 +101,7 @@
         # Lenovo Yoga
         yoga530 = lib.nixosSystem {
           system = "x86_64-linux";
-          modules = [ ./hosts/yoga530 ];
+          modules = [ ./hosts/yoga530 { _module.args.disk = "/dev/disk/by-id/nvme-SAMSUNG_MZVLW128HEGR-000L2_S35FNX0K439214"; } ];
           specialArgs = { inherit inputs outputs; };
         };
       };

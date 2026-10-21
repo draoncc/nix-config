@@ -21,6 +21,12 @@ let
     semicolon = "code:47";
     P = "code:33";
   };
+
+  swayosd = {
+    brightness = "swayosd-client --brightness +0";
+    output-volume = "swayosd-client --output-volume +0";
+    input-volume = "swayosd-client --input-volume +0";
+  };
 in {
   imports = [ ./tty-init.nix ./basic-binds.nix ./systemd-fixes.nix ];
 
@@ -29,6 +35,13 @@ in {
     # hyprslurp
     hyprpicker
   ];
+
+  xdg.portal = {
+    extraPortals = [(pkgs.xdg-desktop-portal-hyprland.override {hyprland = config.wayland.windowManager.hyprland.package;})];
+    config.hyprland = {
+      default = ["hyprland" "gtk"];
+    };
+  };
 
   wayland.windowManager.hyprland = {
     enable = true;
@@ -134,16 +147,16 @@ in {
         "${mod},${v},exec,${editor}"
         "${mod},${b},exec,${browser}"
 
-        # Brightness control (only works if the system has lightd)
-        ",XF86MonBrightnessUp,exec,light -A 10"
-        ",XF86MonBrightnessDown,exec,light -U 10"
+        # Brightness control (only works if the system has brightnessctl)
+        ",XF86MonBrightnessUp,exec,brightnessctl s +10%; ${swayosd.brightness}"
+        ",XF86MonBrightnessDown,exec,brightnessctl s -10%; ${swayosd.brightness}"
 
         # Volume
-        ",XF86AudioRaiseVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ +5%"
-        ",XF86AudioLowerVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ -5%"
-        ",XF86AudioMute,exec,${pactl} set-sink-mute @DEFAULT_SINK@ toggle"
-        "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
-        ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle"
+        ",XF86AudioRaiseVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ +5%; ${swayosd.output-volume}"
+        ",XF86AudioLowerVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ -5%; ${swayosd.output-volume}"
+        ",XF86AudioMute,exec,${pactl} set-sink-mute @DEFAULT_SINK@ toggle; ${swayosd.output-volume}"
+        "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
+        ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
 
         # Screenshotting
         ",Print,exec,${grimblast} --notify --freeze copy output"

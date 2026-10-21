@@ -27,12 +27,12 @@ in
     cinoCfg.gtk.iconTheme.package
   ];
 
-  programs.regreet = {
+  services.displayManager.regreet = {
     enable = true;
     settings = {
       GTK = {
-        icon_theme_name = "ePapirus";
-        theme_name = cinoCfg.gtk.theme.name;
+        icon_theme_name = lib.mkDefault "ePapirus";
+        theme_name = lib.mkDefault cinoCfg.gtk.theme.name;
       };
       background = {
         path = cinoCfg.wallpaper;

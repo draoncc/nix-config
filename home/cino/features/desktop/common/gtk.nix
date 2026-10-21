@@ -11,12 +11,13 @@ in rec {
     };
     theme = {
       name = "${config.colorscheme.slug}";
-      package = gtkThemeFromScheme { scheme = config.colorscheme; };
+      package = pkgs.materia-theme; # gtkThemeFromScheme { scheme = config.colorscheme; };
     };
     iconTheme = {
       name = "Papirus";
       package = pkgs.papirus-icon-theme;
     };
+    gtk4.theme = config.gtk.theme;
   };
 
   services.xsettingsd = {
@@ -26,4 +27,6 @@ in rec {
       "Net/IconThemeName" = "${gtk.iconTheme.name}";
     };
   };
+
+  xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-gtk];
 }

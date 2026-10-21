@@ -1,1 +1,1 @@
-{ programs.light.enable = true; }
+{ pkgs, ... }: { environment.systemPackages = [pkgs.brightnessctl]; }

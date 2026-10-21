@@ -5,8 +5,8 @@ stdenvNoCC.mkDerivation rec {
   version = "1.0";
 
   src = fetchzip {
-    url = "https://www.luciole-vision.com/Fichiers/Luciole_webfonts.zip";
-    sha256 = "sha256-67yd5U8RmTX+zf9qnmrnZ4WITV674DJcYWovXaS402Y=";
+    url = "https://www.luciole-vision.com/fonts/Luciole_webfonts.zip";
+    sha256 = "sha256-o/Za6zTEFa8JQA+zOTILxZUY71prTT8uL7ZOOoJ4tn8=";
     stripRoot = false;
   };
 
@@ -18,7 +18,7 @@ stdenvNoCC.mkDerivation rec {
 
   installPhase = ''
     runHook preInstall
-    install -Dm644 -t $out/share/fonts/truetype/ Luciole_webfonts/Luciole-*/*.ttf
+    install -Dm644 -t $out/share/fonts/truetype/ Luciole_webfonts/Luciole-*.ttf
     runHook postInstall
   '';
 

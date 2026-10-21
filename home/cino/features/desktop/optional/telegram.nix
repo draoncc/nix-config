@@ -1,1 +1,1 @@
-{ pkgs, ... }: { home.packages = with pkgs; [ tdesktop ]; }
+{ pkgs, ... }: { home.packages = with pkgs; [ telegram-desktop ]; }

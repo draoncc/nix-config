@@ -12,7 +12,6 @@ let
   xargs = "${pkgs.findutils}/bin/xargs";
   timeout = "${pkgs.coreutils}/bin/timeout";
   ping = "${pkgs.iputils}/bin/ping";
-
   jq = "${pkgs.jq}/bin/jq";
   # gamemoded = "${pkgs.gamemode}/bin/gamemoded";
   systemctl = "${pkgs.systemd}/bin/systemctl";
@@ -311,7 +310,7 @@ in {
     # x y z -> top, horizontal, bottom
     # w x y z -> top, right, bottom, left
     style = let
-      inherit (config.colorscheme) colors;
+      inherit (config.colorscheme) palette;
       # css
     in ''
       * {
@@ -339,34 +338,34 @@ in {
       }
 
       window#waybar {
-        color: #${colors.base05};
+        color: #${palette.base05};
         background-color: rgba(0, 0, 0, 0);
-        /* background-color: #${colors.base00}; */
+        /* background-color: #${palette.base00}; */
         /* border-width: 2px; */
         border-style: solid;
-        border-color: #${colors.base0C};
+        border-color: #${palette.base0C};
         /* border-radius: 10px; */
       }
 
       #workspaces button {
-        background-color: #${colors.base01};
-        color: #${colors.base05};
+        background-color: #${palette.base01};
+        color: #${palette.base05};
         padding: 5px 1px;
         margin: 3px 0;
         border-radius: 10px;
       }
       #workspaces button.hidden {
-        background-color: #${colors.base00};
-        color: #${colors.base04};
+        background-color: #${palette.base00};
+        color: #${palette.base04};
       }
       #workspaces button.focused,
       #workspaces button.active {
-        background-color: #${colors.base0A};
-        color: #${colors.base00};
+        background-color: #${palette.base0A};
+        color: #${palette.base00};
       }
 
       #clock {
-        background-color: #${colors.base00};
+        background-color: #${palette.base00};
         /* padding-left: 15px;
         padding-right: 15px;
         margin-top: 0;
@@ -375,16 +374,16 @@ in {
       }
 
       #custom-menu {
-        background-color: #${colors.base0C};
-        color: #${colors.base00};
+        background-color: #${palette.base0C};
+        color: #${palette.base00};
         padding-left: 15px;
         padding-right: 22px;
         margin: 0;
         /* border-radius: 10px; */
       }
       #custom-hostname {
-        background-color: #${colors.base0C};
-        color: #${colors.base00};
+        background-color: #${palette.base0C};
+        color: #${palette.base00};
         padding-left: 15px;
         padding-right: 18px;
         margin-right: 0;
@@ -397,23 +396,23 @@ in {
       }
 
       #battery {
-        background: #${colors.base00};
+        background: #${palette.base00};
         transition: color 0.5s ease-in;
       }
       #battery.warning {
-        color: #${colors.base0A};
+        color: #${palette.base0A};
       }
       #battery.critical {
         animation: flashing 0.5s infinite ease-in-out;
       }
       @keyframes flashing {
-        0% { color: #${colors.base0F}; }
-        50% { color: #${colors.base05}; }
-        100% { color: #${colors.base0F}; }
+        0% { color: #${palette.base0F}; }
+        50% { color: #${palette.base05}; }
+        100% { color: #${palette.base0F}; }
       }
 
       #tray {
-        color: #${colors.base05};
+        color: #${palette.base05};
       }
     '';
   };
