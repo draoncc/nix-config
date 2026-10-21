@@ -17,7 +17,7 @@
       "wheel"
     ];
     hashedPassword =
-      "$6$zSPBGBvubSamHDYf$ElvGr0CmeCt7uO5YMxdLgizoX/nZr/PUyjpI1uZEGzkhLgDuVv6Sy/HRr9oC9mpqAjw.bIhOEc2mFQDIbc7Hw1";
+      "$y$j9T$vDFlouCPsaL2VS1fO2iWT/$mf7JwgiP0d9mPWzfo.QyQ51QK9uCio4kOOG7tyil2n6";
 
     openssh.authorizedKeys.keys = lib.splitString "\n" (builtins.readFile ../../../../home/cino/ssh.pub);
   };
