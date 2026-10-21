@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # Make users congruent to NixOS configuration.
@@ -11,6 +11,8 @@
     extraGroups = [ "wheel" "video" "audio" "docker" ]; # Enable ‘sudo’ for the user.
     hashedPassword =
       "$6$zSPBGBvubSamHDYf$ElvGr0CmeCt7uO5YMxdLgizoX/nZr/PUyjpI1uZEGzkhLgDuVv6Sy/HRr9oC9mpqAjw.bIhOEc2mFQDIbc7Hw1";
+
+    openssh.authorizedKeys.keys = lib.splitString "\n" (builtins.readFile ../../../../home/cino/ssh.pub);
   };
 
   home-manager.users.cino =
