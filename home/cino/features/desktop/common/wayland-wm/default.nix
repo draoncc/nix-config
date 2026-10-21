@@ -1,31 +1,21 @@
 { pkgs, ... }: {
   imports = [
-    # ./hyprland-vnc.nix
+    ./cliphist.nix
+    ./clip-notify.nix
     # ./gammastep.nix
     ./mako.nix
-    ./swayidle.nix
-    ./swaylock.nix
     ./waybar.nix
     ./wofi.nix
+    ./swayosd.nix
     # ./zathura.nix
   ];
 
   xdg.mimeApps.enable = true;
   home.packages = with pkgs; [
-    grim
-    gtk3 # For gtk-launch
-    imv
-    mimeo
-    # primary-xwayland
-    pulseaudio
-    slurp
-    waypipe
     wf-recorder
     wl-clipboard
-    wl-mirror
+    # wl-mirror
     # wl-mirror-pick
-    # xdg-utils-spawn-terminal # Patched to open terminal
-    ydotool
   ];
 
   home.sessionVariables = {

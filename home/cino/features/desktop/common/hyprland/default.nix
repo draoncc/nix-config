@@ -27,14 +27,26 @@ let
     output-volume = "swayosd-client --output-volume +0";
     input-volume = "swayosd-client --input-volume +0";
   };
+  grimblast = lib.getExe pkgs.grimblast;
 in {
-  imports = [ ./tty-init.nix ./basic-binds.nix ./systemd-fixes.nix ];
+  imports = [
+    ../wayland-wm
 
-  home.packages = with pkgs; [
-    inputs.hyprwm-contrib.grimblast
-    # hyprslurp
-    hyprpicker
+    ./tty-init.nix
+    ./basic-binds.nix
+    ./systemd-fixes.nix
+    ./hyprbars.nix
+    ./hyprlock.nix
+    ./hypridle.nix
+    ./hyprpaper.nix
   ];
+
+  home.packages = [
+    pkgs.grimblast
+    pkgs.hyprpicker
+  ];
+
+  # home.pointerCursor.hyprcursor.enable = true;
 
   xdg.portal = {
     extraPortals = [(pkgs.xdg-desktop-portal-hyprland.override {hyprland = config.wayland.windowManager.hyprland.package;})];
@@ -129,7 +141,6 @@ in {
             }
           }/bin/pass-wofi";
 
-        grimblast = "${pkgs.inputs.hyprwm-contrib.grimblast}/bin/grimblast";
         pactl = "${pkgs.pulseaudio}/bin/pactl";
 
         gtk-launch = "${pkgs.gtk3}/bin/gtk-launch";
@@ -198,15 +209,11 @@ in {
         "${mod},${keymaps.semicolon},exec,pass-wofi"
       ]));
 
-      monitor = map (m:
-        let
-          resolution = "${toString m.width}x${toString m.height}@${
-              toString m.refreshRate
-            }";
-          position = "${toString m.x}x${toString m.y}";
-        in "${m.name},${
-          if m.enabled then "${resolution},${position},1" else "disable"
-        }") (config.monitors);
+      monitor = map (m: "${m.name},${
+        if m.enabled
+        then "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},${toString m.scale}"
+        else "disable"
+      }") (config.monitors);
 
       workspace = map (m: "${m.name},${m.workspace}")
         (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
