@@ -16,6 +16,8 @@
     enableCompletion = true;
     autosuggestion.enable = true;
 
+    history.path = "${config.home.homeDirectory}/.local/share/zsh/.zsh_history";
+
     shellAliases = {
       p = "gopass";
       ls = "LC_COLLATE=C ls --color=auto --group-directories-first";
@@ -54,4 +56,10 @@
       plugins = [ "z" "git" "gh" "terraform" ];
     };
   };
+
+  home.persistence."/persist".directories = [
+    ".local/share/zsh"
+    ".cache/antidote"
+    ".cache/oh-my-zsh"
+  ];
 }

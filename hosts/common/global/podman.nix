@@ -8,7 +8,7 @@ in {
     defaultNetwork.settings.dns_enabled = true;
   };
 
-  environment.persistence = {
-    "/persist".directories = [{directory = "/var/lib/containers";}];
-  };
+  environment.persistence."/persist".directories = [
+    {directory = "/var/lib/containers";}
+  ];
 }
