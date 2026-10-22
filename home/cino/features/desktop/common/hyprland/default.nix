@@ -100,7 +100,16 @@ in
   wayland.windowManager.hyprland = {
     enable = true;
     package = pkgs.inputs.hyprland.hyprland;
-    # Hyprland (git) only reads hyprland.lua; hyprland.conf is ignored.
+    # The hyprland input tracks git main, not a release. It only reads
+    # hyprland.lua (hyprland.conf is ignored), and `hyprctl dispatch` takes
+    # Lua too, e.g. `hyprctl dispatch 'hl.dsp.exit()'`.
+    # Lua API reference (the wiki may lag behind main):
+    # - types: ${package}/share/hypr/stubs/hl.meta.lua
+    # - dispatcher arguments (stubs leave them untyped):
+    #   src/config/lua/bindings/LuaBindingsDispatchers.cpp in the input's source
+    # Plugins load after the first config pass, so hl.plugin.<name> is nil
+    # until then; guard plugin calls (see hyprbars.nix).
+    # Verify changes with `nix flake check` (see checks/default.nix).
     configType = "lua";
 
     settings = {
