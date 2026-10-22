@@ -76,7 +76,7 @@ in
       general = {
         gaps_in = 15;
         gaps_out = 20;
-        border_size = 2.7;
+        border_size = 3;
         # cursor_inactive_timeout = 4;
         "col.active_border" = "0xff${config.colorscheme.palette.base0C}";
         "col.inactive_border" = "0xff${config.colorscheme.palette.base02}";
@@ -95,7 +95,7 @@ in
         touchpad.disable_while_typing = false;
       };
 
-      misc.vfr = true;
+      debug.vfr = true;
 
       decoration = {
         active_opacity = 0.92;
