@@ -10,6 +10,9 @@ format FILE:
 format-all:
     for file in $(find . -name '*.nix'); do nixfmt $file; done
 
+check:
+    nix flake check --no-build
+
 test:
     sudo nixos-rebuild --flake .#{{hostname}} test
 
