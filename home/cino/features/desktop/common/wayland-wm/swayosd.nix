@@ -1,6 +1,6 @@
 { pkgs, config, ... }:
 let
-  palette = config.lib.stylix.colors.withHashtag;
+  palette = config.lib.stylix.colors;
 in
 {
   services.swayosd = {
@@ -10,7 +10,7 @@ in
         padding: 0 1em;
         border: 10em;
         border-radius: 10em;
-        background-color: ${palette.base00};
+        background-color: #${palette.base00};
         opacity: 0.7;
       }
       #container {
@@ -18,15 +18,15 @@ in
       }
 
       image {
-        color: ${palette.base01};
+        color: #${palette.base01};
         opacity: 0.9;
       }
       image:disabled {
-        color: ${palette.base04};
+        color: #${palette.base04};
         opacity: 0.8;
       }
       label {
-        color: ${palette.base04};
+        color: #${palette.base04};
         opacity: 1;
       }
 
@@ -34,7 +34,7 @@ in
         min-height: inherit;
         border-radius: inherit;
         border: none;
-        background-color: ${palette.base01};
+        background-color: #${palette.base01};
         opacity: 0.9;
       }
       progressbar {
@@ -52,7 +52,7 @@ in
         min-height: inherit;
         border-radius: inherit;
         border: none;
-        background-color: ${palette.base02};
+        background-color: #${palette.base02};
         opacity: 1;
       }
     '';

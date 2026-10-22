@@ -12,6 +12,8 @@ let
     exec
     ;
 
+  palette = config.lib.stylix.colors;
+
   mod = "ALT";
   keymaps = {
     e = "code:26";
@@ -119,8 +121,8 @@ in
           gaps_out = 20;
           border_size = 3;
           col = {
-            active_border = "rgb(${config.lib.stylix.colors.base0C})";
-            inactive_border = "rgb(${config.lib.stylix.colors.base02})";
+            active_border = "rgb(${palette.base0C})";
+            inactive_border = "rgb(${palette.base02})";
           };
         };
 

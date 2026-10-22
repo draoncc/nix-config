@@ -25,6 +25,8 @@
 
   xdg.enable = true;
 
+  # Stylix's fontconfig target only sets defaultFonts, and home-manager
+  # doesn't inherit target settings from the NixOS module
   fonts.fontconfig.enable = true;
   stylix.targets = {
     fontconfig.enable = true;

@@ -1,6 +1,9 @@
 { config, lib, ... }:
 let
   inherit (import ./lua.nix { inherit lib; }) keys bind exec;
+  palette = config.lib.stylix.colors;
+  inherit (config.stylix) fonts;
+  textColor = "rgb(${palette.base01})";
 
   # With no declared monitors, draw once across all of them (monitor = "")
   monitors =
@@ -43,8 +46,8 @@ in
         size = "800, 90";
         dots_size = toString (0.25 * monitor.scale);
         placeholder_text = "";
-        font_color = "rgb(${config.lib.stylix.colors.base01})";
-        font_family = config.stylix.fonts.sansSerif.name;
+        font_color = textColor;
+        font_family = fonts.sansSerif.name;
         position = "0, -20%";
         # $FAIL is moves to another label
         fail_text = "";
@@ -59,16 +62,16 @@ in
           {
             monitor = monitor.name;
             text = "$TIME";
-            color = "rgb(${config.lib.stylix.colors.base01})";
-            font_family = config.stylix.fonts.sansSerif.name;
+            color = textColor;
+            font_family = fonts.sansSerif.name;
             font_size = toString (builtins.floor (140 * monitor.scale));
             position = "0, 0";
           }
           {
             monitor = monitor.name;
             text = "$FAIL";
-            color = "rgb(${config.lib.stylix.colors.base01})";
-            font_family = config.stylix.fonts.sansSerif.name;
+            color = textColor;
+            font_family = fonts.sansSerif.name;
             font_size = toString (builtins.floor (18 * monitor.scale));
             position = "0, -40%";
           }

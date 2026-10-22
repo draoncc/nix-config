@@ -9,8 +9,10 @@
     enable = true;
     autoEnable = false;
     polarity = "dark";
+    # Translucent notifications: mako's old dd alpha (Stylix rounds up)
+    opacity.popups = 0.866;
 
-    # Material Darker (base16) with Material Dark's extra base24 slots: darker
+    # Material Darker (base16) with Material Dark's extra base24 slots: extra
     # backgrounds (base10-11) and bright colours (base12-17). From
     # tinted-theming/schemes base16/material-darker.yaml and
     # base24/material-dark.yaml.

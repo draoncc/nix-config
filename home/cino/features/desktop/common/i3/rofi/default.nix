@@ -10,7 +10,6 @@
       rofi-emoji
       rofi-screenshot
     ];
-    themePlugins."adi1090x-rofi".enable = true;
     extraConfig = {
       modi = "window,run,ssh,drun,combi,calc";
       combi-modi = "window,drun";

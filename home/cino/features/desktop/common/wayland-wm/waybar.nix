@@ -340,12 +340,13 @@ in
     style =
       let
         palette = config.lib.stylix.colors;
+        inherit (config.stylix) fonts;
         # css
       in
       ''
         * {
-          font-family: ${config.stylix.fonts.sansSerif.name}, ${config.stylix.fonts.monospace.name};
-          font-size: ${toString config.stylix.fonts.sizes.desktop}pt;
+          font-family: ${fonts.sansSerif.name}, ${fonts.monospace.name};
+          font-size: ${toString fonts.sizes.desktop}pt;
           min-width: 24px;
           padding: 0 8px;
           border-radius: 24px;
