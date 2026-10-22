@@ -5,10 +5,10 @@ host := `uname -a`
 hostname := `hostname`
 
 format FILE:
-    nixfmt {{FILE}}
+    nix fmt {{FILE}}
 
 format-all:
-    for file in $(find . -name '*.nix'); do nixfmt $file; done
+    nix fmt
 
 check:
     nix flake check --no-build
