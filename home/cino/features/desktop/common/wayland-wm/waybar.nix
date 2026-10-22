@@ -339,13 +339,13 @@ in
     # w x y z -> top, right, bottom, left
     style =
       let
-        inherit (config.colorscheme) palette;
+        palette = config.lib.stylix.colors;
         # css
       in
       ''
         * {
-          font-family: ${config.fontProfiles.regular.family}, ${config.fontProfiles.monospace.family};
-          font-size: 12pt;
+          font-family: ${config.stylix.fonts.sansSerif.name}, ${config.stylix.fonts.monospace.name};
+          font-size: ${toString config.stylix.fonts.sizes.desktop}pt;
           min-width: 24px;
           padding: 0 8px;
           border-radius: 24px;

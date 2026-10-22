@@ -1,6 +1,6 @@
 { pkgs, config, ... }:
 let
-  inherit (config.colorscheme) palette;
+  palette = config.lib.stylix.colors.withHashtag;
 in
 {
   services.swayosd = {

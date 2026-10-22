@@ -1,7 +1,7 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 
 {
-  home.file.".config/rofi/material.rasi".text = lib.strings.fileContents ./material.rasi;
+  stylix.targets.rofi.enable = true;
 
   programs.rofi = {
     enable = true;

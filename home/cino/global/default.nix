@@ -1,5 +1,4 @@
 {
-  inputs,
   lib,
   config,
   outputs,
@@ -8,7 +7,6 @@
 
 {
   imports = [
-    inputs.nix-colors.homeManagerModule
     ./nix.nix
   ]
   ++ (builtins.attrValues outputs.homeModules);
@@ -26,6 +24,12 @@
   programs.home-manager.enable = true;
 
   xdg.enable = true;
+
+  fonts.fontconfig.enable = true;
+  stylix.targets = {
+    fontconfig.enable = true;
+    font-packages.enable = true;
+  };
 
   home = {
     username = lib.mkDefault "cino";

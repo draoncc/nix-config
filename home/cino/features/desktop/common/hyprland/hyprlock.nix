@@ -43,8 +43,8 @@ in
         size = "800, 90";
         dots_size = toString (0.25 * monitor.scale);
         placeholder_text = "";
-        font_color = "rgb(${lib.removePrefix "#" config.colorscheme.palette.base01})";
-        font_family = config.fontProfiles.regular.family;
+        font_color = "rgb(${config.lib.stylix.colors.base01})";
+        font_family = config.stylix.fonts.sansSerif.name;
         position = "0, -20%";
         # $FAIL is moves to another label
         fail_text = "";
@@ -59,16 +59,16 @@ in
           {
             monitor = monitor.name;
             text = "$TIME";
-            color = "rgb(${lib.removePrefix "#" config.colorscheme.palette.base01})";
-            font_family = config.fontProfiles.regular.family;
+            color = "rgb(${config.lib.stylix.colors.base01})";
+            font_family = config.stylix.fonts.sansSerif.name;
             font_size = toString (builtins.floor (140 * monitor.scale));
             position = "0, 0";
           }
           {
             monitor = monitor.name;
             text = "$FAIL";
-            color = "rgb(${lib.removePrefix "#" config.colorscheme.palette.base01})";
-            font_family = config.fontProfiles.regular.family;
+            color = "rgb(${config.lib.stylix.colors.base01})";
+            font_family = config.stylix.fonts.sansSerif.name;
             font_size = toString (builtins.floor (18 * monitor.scale));
             position = "0, -40%";
           }

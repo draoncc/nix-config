@@ -7,6 +7,7 @@
     ./zsh.nix
     ./podman.nix
     ./display-manager.nix
+    ./stylix.nix
   ];
 
   programs.fuse.userAllowOther = true;

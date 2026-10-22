@@ -1,13 +1,12 @@
 {
+  stylix.targets.plymouth.enable = true;
+
   console = {
     earlySetup = false;
   };
 
   boot = {
-    plymouth = {
-      enable = true;
-      theme = "spinner";
-    };
+    plymouth.enable = true;
     loader.timeout = 0;
     kernelParams = [
       "quiet"

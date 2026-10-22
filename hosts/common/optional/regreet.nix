@@ -21,6 +21,11 @@ in
     "${pkgs.dbus}/bin/dbus-run-session ${lib.getExe pkgs.cage} ${lib.escapeShellArgs cfg.cageArgs} -- ${lib.getExe cfg.package}"
   ];
 
+  # Its "custom default_session.command may not work" warning is a string
+  # compare against upstream's command; ours only prefixes the XKB env, and
+  # regreet still reads the theme from its own config.
+  stylix.targets.regreet.enable = true;
+
   services.displayManager.regreet = {
     enable = true;
     cageArgs = [
@@ -32,15 +37,6 @@ in
     iconTheme = {
       name = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;
-    };
-    theme = {
-      name = "Materia-dark";
-      package = pkgs.materia-theme;
-    };
-    font = {
-      name = "Luciole";
-      package = pkgs.luciole;
-      size = 12;
     };
     cursorTheme = {
       package = pkgs.apple-cursor;

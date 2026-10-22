@@ -1,6 +1,5 @@
 {
   imports = [
-    ./font.nix
     ./wezterm.nix
     ./gtk.nix
     ./qt.nix

@@ -119,8 +119,8 @@ in
           gaps_out = 20;
           border_size = 3;
           col = {
-            active_border = "rgb(${config.colorscheme.palette.base0C})";
-            inactive_border = "rgb(${config.colorscheme.palette.base02})";
+            active_border = "rgb(${config.lib.stylix.colors.base0C})";
+            inactive_border = "rgb(${config.lib.stylix.colors.base02})";
           };
         };
 

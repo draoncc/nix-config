@@ -1,9 +1,8 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
-let
-  inherit (config) colorscheme;
-in
 {
+  stylix.targets.helix.enable = true;
+
   home.sessionVariables.COLORTERM = "truecolor";
   home.packages = with pkgs; [ netcat-gnu ]; # godot language server
   programs.helix = {
@@ -11,8 +10,6 @@ in
     defaultEditor = true;
 
     settings = {
-      theme = "${builtins.replaceStrings [ "-" ] [ "_" ] colorscheme.slug}";
-
       editor = {
         auto-format = true;
         color-modes = true;

@@ -5,6 +5,8 @@
   ...
 }:
 {
+  stylix.targets.wofi.enable = true;
+
   programs.wofi = {
     enable = true;
     package = pkgs.wofi.overrideAttrs (oa: {

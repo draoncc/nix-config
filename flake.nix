@@ -6,7 +6,10 @@
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     nixos-facter-modules.url = "github:nix-community/nixos-facter-modules";
 
-    nix-colors.url = "github:misterio77/nix-colors";
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     hardware = {
       url = "github:nixos/nixos-hardware";

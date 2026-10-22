@@ -12,11 +12,5 @@
     ) inputs;
   };
 
-  nix-colors = final: _: {
-    nodePackages = {
-      sass = final.dar;
-    };
-  };
-
   additions = final: prev: import ../pkgs { pkgs = final; };
 }

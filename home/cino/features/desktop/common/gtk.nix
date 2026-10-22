@@ -1,29 +1,15 @@
-{
-  config,
-  pkgs,
-  inputs,
-  ...
-}:
+{ config, pkgs, ... }:
 
-let
-  inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) gtkThemeFromScheme;
-in
-rec {
+{
+  # Theme and font come from Stylix
+  stylix.targets.gtk.enable = true;
+
   gtk = {
     enable = true;
-    font = {
-      name = config.fontProfiles.regular.family;
-      size = 12;
-    };
-    theme = {
-      name = "${config.colorscheme.slug}";
-      package = pkgs.materia-theme;
-    };
     iconTheme = {
       name = "Papirus";
       package = pkgs.papirus-icon-theme;
     };
-    gtk4.theme = config.gtk.theme;
   };
 
   home.pointerCursor = {
@@ -37,8 +23,8 @@ rec {
   services.xsettingsd = {
     enable = true;
     settings = {
-      "Net/ThemeName" = "${gtk.theme.name}";
-      "Net/IconThemeName" = "${gtk.iconTheme.name}";
+      "Net/ThemeName" = config.gtk.theme.name;
+      "Net/IconThemeName" = config.gtk.iconTheme.name;
     };
   };
 

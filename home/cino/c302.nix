@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ ... }:
 
 {
   imports = [
@@ -7,8 +7,6 @@
     ./features/desktop/common
     ./features/desktop/optional/telegram.nix
   ];
-
-  colorscheme = inputs.nix-colors.colorschemes.material-darker;
 
   monitors = [
     {

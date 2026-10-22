@@ -9,15 +9,15 @@ let
   inherit (import ./lua.nix { inherit lib; }) hyprctlDispatch toLua;
   rgb = color: "rgb(${lib.removePrefix "#" color})";
   rgba = color: alpha: "rgba(${lib.removePrefix "#" color}${alpha})";
-  palette = config.colorscheme.palette;
+  palette = config.lib.stylix.colors;
 
   settings = {
     # Local colors
     bar_color = rgba palette.base00 "dd";
     col.text = rgb palette.base01;
     bar_height = 25;
-    bar_text_font = config.fontProfiles.regular.family;
-    bar_text_size = builtins.floor (12 * 1.4);
+    bar_text_font = config.stylix.fonts.sansSerif.name;
+    bar_text_size = builtins.floor (config.stylix.fonts.sizes.desktop * 1.4);
     bar_part_of_window = false;
     bar_precedence_over_border = false;
   };

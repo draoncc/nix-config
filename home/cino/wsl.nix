@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ ... }:
 
 {
   imports = [
@@ -10,6 +10,4 @@
     ./features/cli/optional/claude.nix
     ./features/lang
   ];
-
-  colorscheme = inputs.nix-colors.colorschemes.material-darker;
 }
