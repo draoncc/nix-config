@@ -2,7 +2,7 @@
 
 **Checks**: `just check` after changing a config (builds `checks/`), plus `just hyprlock-check` for hyprlock; after a switch, `just config-errors SINCE` lists errors from configs only parsed at runtime. Hyprland config is Lua: start at the comment above `configType` in `home/cino/features/desktop/common/hyprland/default.nix`.
 
-**Runtime testing** of Hyprland, hyprlock or hypridle: `scripts/nested-hyprland` runs a throwaway nested compositor, leaving the live tty sessions untouched.
+**Runtime testing** of Hyprland, hyprlock or hypridle: `scripts/nested-hyprland` runs a throwaway nested compositor, leaving the live tty sessions untouched. To see a theming or bar change before a switch: `just preview HOST`, then read the PNG it prints.
 
 ## Agent skills
 

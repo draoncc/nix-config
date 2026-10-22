@@ -14,6 +14,10 @@ format-all:
 check:
     nix flake check
 
+# Run `just check` before each commit that touches the config
+install-hooks:
+    git config core.hooksPath .githooks
+
 # Evaluate only: fast, but skips checks/
 eval:
     nix flake check --no-build
@@ -47,6 +51,28 @@ hyprlock-check HOST=hostname:
       if grep -a "Config error" "$log"; then exit 1; fi
       echo "hyprlock config ok"
     ' _ "$hyprlock" "$conf"
+
+# Screenshot HOST's built desktop (waybar, a notification, a GTK window with
+# hyprbars) in a nested Hyprland, without switching. Prints the PNG's path.
+preview HOST=hostname FILE=("/tmp/preview-" + HOST + ".png"):
+    #!/usr/bin/env bash
+    set -eu
+    bin() { nix build --no-link --print-out-paths --inputs-from . "nixpkgs#$1"; }
+    home=$(nix build --no-link --print-out-paths ".#nixosConfigurations.{{HOST}}.config.home-manager.users.cino.home.path")
+    gtk=$(bin gtk3.dev) glib=$(bin glib.bin)
+    scripts/nested-hyprland --host {{HOST}} -- bash -c '
+      "$1/bin/waybar" >/dev/null 2>&1 &
+      "$1/bin/mako" >/dev/null 2>&1 &
+      "$2/bin/gtk3-widget-factory" >/dev/null 2>&1 &
+      sleep 2
+      "$3/bin/gdbus" call --session --dest org.freedesktop.Notifications \
+        --object-path /org/freedesktop/Notifications \
+        --method org.freedesktop.Notifications.Notify \
+        preview 0 "" Preview "A notification from mako" "[]" "{}" 0 >/dev/null
+      sleep 2
+      scripts/nested-hyprland shot "$4"
+    ' _ "$home" "$gtk" "$glib" {{quote(FILE)}}
+    echo {{quote(FILE)}}
 
 test:
     sudo nixos-rebuild --flake .#{{hostname}} test

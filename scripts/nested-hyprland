@@ -2,11 +2,18 @@
 # Run a command against a throwaway Hyprland nested in the current session,
 # to test compositor/lock/idle behaviour without touching the live sessions.
 #
-#   scripts/nested-hyprland [--config FILE] -- CMD...
+#   scripts/nested-hyprland [--config FILE | --host HOST] -- CMD...
 #       Start a nested Hyprland (empty config by default), run CMD with
 #       WAYLAND_DISPLAY and HYPRLAND_INSTANCE_SIGNATURE pointing at it, then
 #       tear it down: lock clients on its display, the compositor, and its
 #       $XDG_RUNTIME_DIR/hypr/ entry. Exits with CMD's status.
+#       --host HOST builds HOST's home config and runs its Hyprland with its
+#       config, minus the hyprland.start/shutdown hooks. CMD runs on a
+#       private D-Bus with XDG_CONFIG_HOME set to a copy of the built
+#       ~/.config and the built dconf settings loaded, so waybar, mako, GTK,
+#       wofi and fontconfig read the built configs and fonts.
+#   scripts/nested-hyprland shot FILE
+#       Screenshot $WAYLAND_DISPLAY to FILE (PNG). Run it from inside CMD.
 #   scripts/nested-hyprland locked
 #       Exit 0 if the session of $HYPRLAND_INSTANCE_SIGNATURE is locked.
 #   scripts/nested-hyprland lock-pids
@@ -18,7 +25,16 @@
 # - Hyprland never logs session lock state. The only signal is "LOCK" in
 #   each monitor's solitaryBlockedBy (hyprctl -j monitors).
 # - A second hyprlock on an already-locked session doesn't exit; it hangs.
+# - A host config's hyprland.start hook restarts hyprland-session.target and
+#   its shutdown hook stops it, moving or killing the live session's waybar,
+#   hyprpaper, ... (docs/adr/0001). --host drops both hooks.
+# - On Wayland, GTK takes its theme and font from dconf, not settings.ini.
+#   home-manager only writes dconf at activation, so --host loads the
+#   generation's hm-dconf.ini, on the private bus: on the live bus,
+#   dconf-service would write it into the live ~/.config/dconf.
 set -u
+
+flake=$(dirname "$0")/..
 
 locked() {
   timeout 2 hyprctl -j monitors | jq -e 'any(.[]; .solitaryBlockedBy | index("LOCK"))' >/dev/null
@@ -33,18 +49,45 @@ lock_pids() {
 case ${1:-} in
   locked) locked; exit ;;
   lock-pids) lock_pids; exit ;;
+  shot)
+    grim=$(nix build --no-link --print-out-paths --inputs-from "$flake" nixpkgs#grim) || exit 2
+    exec "$grim/bin/grim" "$2" ;;
 esac
 
-config=
-if [ "${1:-}" = --config ]; then config=$2; shift 2; fi
+config= host=
+case ${1:-} in
+  --config) config=$2; shift 2 ;;
+  --host) host=$2; shift 2 ;;
+esac
 [ "${1:-}" = -- ] && shift
 [ $# -gt 0 ] || { sed -n '2,/^set -u/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 2; }
 [ -n "${WAYLAND_DISPLAY:-}" ] || { echo "nested-hyprland: needs a running Wayland session" >&2; exit 2; }
 
 tmp=$(mktemp -d)
+hyprland=Hyprland
+if [ -n "$host" ]; then
+  hm="$flake#nixosConfigurations.$host.config.home-manager.users.cino"
+  files=$(nix build --no-link --print-out-paths "$hm.home-files") &&
+    pkg=$(nix build --no-link --print-out-paths "$hm.wayland.windowManager.hyprland.finalPackage^out") &&
+    gen=$(nix build --no-link --print-out-paths "$hm.home.activationPackage") &&
+    dconf=$(nix build --no-link --print-out-paths "$flake#nixosConfigurations.$host.pkgs.dconf^out") ||
+    { rm -rf "$tmp"; exit 2; }
+  dconf_ini=$(grep -o '/nix/store/[^ ]*-hm-dconf\.ini' "$gen/activate" | head -1)
+  hyprland=$pkg/bin/Hyprland
+  cp -rL "$files/.config" "$tmp/config" && chmod -R u+w "$tmp/config"
+  export XDG_CONFIG_HOME=$tmp/config
+  config=$tmp/hyprland.lua
+  cat >"$config" <<EOF
+local on = hl.on
+hl.on = function(event, fn)
+  if event ~= "hyprland.start" and event ~= "hyprland.shutdown" then return on(event, fn) end
+end
+dofile("$tmp/config/hypr/hyprland.lua")
+EOF
+fi
 if [ -z "$config" ]; then config=$tmp/hyprland.lua; : >"$config"; fi
 
-HYPRLAND_INSTANCE_SIGNATURE= Hyprland --config "$config" >"$tmp/hyprland.log" 2>&1 &
+HYPRLAND_INSTANCE_SIGNATURE= "$hyprland" --config "$config" >"$tmp/hyprland.log" 2>&1 &
 hpid=$!
 sig=
 cleanup() {
@@ -73,4 +116,12 @@ fi
 sig=$(jq -r .instance <<<"$instance")
 wl=$(jq -r .wl_socket <<<"$instance")
 
-WAYLAND_DISPLAY=$wl HYPRLAND_INSTANCE_SIGNATURE=$sig "$@"
+export WAYLAND_DISPLAY=$wl HYPRLAND_INSTANCE_SIGNATURE=$sig
+if [ -n "$host" ]; then
+  dbus-run-session -- bash -c '
+    if [ -n "$2" ]; then "$1/bin/dconf" load / <"$2" || exit 2; fi
+    shift 2; exec "$@"
+  ' _ "$dconf" "$dconf_ini" "$@"
+else
+  "$@"
+fi
