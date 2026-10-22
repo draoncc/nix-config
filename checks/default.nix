@@ -1,5 +1,5 @@
 # Build-time checks for each host's generated home configs.
-# Run with `nix flake check` (`just check` only evaluates, so it skips these).
+# Run with `just check` (`just eval` only evaluates, so it skips these).
 {
   pkgs,
   lib,

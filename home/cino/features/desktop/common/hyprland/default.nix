@@ -109,7 +109,7 @@ in
     #   src/config/lua/bindings/LuaBindingsDispatchers.cpp in the input's source
     # Plugins load after the first config pass, so hl.plugin.<name> is nil
     # until then; guard plugin calls (see hyprbars.nix).
-    # Verify changes with `nix flake check` (see checks/default.nix).
+    # Verify changes with `just check` (see checks/default.nix).
     configType = "lua";
 
     settings = {
