@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Run a command against a throwaway Hyprland nested in the current session,
+# to test compositor/lock/idle behaviour without touching the live sessions.
+#
+#   scripts/nested-hyprland [--config FILE] -- CMD...
+#       Start a nested Hyprland (empty config by default), run CMD with
+#       WAYLAND_DISPLAY and HYPRLAND_INSTANCE_SIGNATURE pointing at it, then
+#       tear it down: lock clients on its display, the compositor, and its
+#       $XDG_RUNTIME_DIR/hypr/ entry. Exits with CMD's status.
+#   scripts/nested-hyprland locked
+#       Exit 0 if the session of $HYPRLAND_INSTANCE_SIGNATURE is locked.
+#   scripts/nested-hyprland lock-pids
+#       Print hyprlock pids on $WAYLAND_DISPLAY.
+#
+# Gotchas this encodes:
+# - Hyprland has no headless backend here; the nested instance is a window
+#   on the current session's display (needs a running Hyprland session).
+# - Hyprland never logs session lock state. The only signal is "LOCK" in
+#   each monitor's solitaryBlockedBy (hyprctl -j monitors).
+# - A second hyprlock on an already-locked session doesn't exit; it hangs.
+set -u
+
+locked() {
+  timeout 2 hyprctl -j monitors | jq -e 'any(.[]; .solitaryBlockedBy | index("LOCK"))' >/dev/null
+}
+
+lock_pids() {
+  for pid in $(pgrep -xu "$UID" hyprlock); do
+    grep -qzx "WAYLAND_DISPLAY=$WAYLAND_DISPLAY" "/proc/$pid/environ" 2>/dev/null && echo "$pid"
+  done
+}
+
+case ${1:-} in
+  locked) locked; exit ;;
+  lock-pids) lock_pids; exit ;;
+esac
+
+config=
+if [ "${1:-}" = --config ]; then config=$2; shift 2; fi
+[ "${1:-}" = -- ] && shift
+[ $# -gt 0 ] || { sed -n '2,/^set -u/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 2; }
+[ -n "${WAYLAND_DISPLAY:-}" ] || { echo "nested-hyprland: needs a running Wayland session" >&2; exit 2; }
+
+tmp=$(mktemp -d)
+if [ -z "$config" ]; then config=$tmp/hyprland.lua; : >"$config"; fi
+
+HYPRLAND_INSTANCE_SIGNATURE= Hyprland --config "$config" >"$tmp/hyprland.log" 2>&1 &
+hpid=$!
+sig=
+cleanup() {
+  if [ -n "$sig" ]; then
+    for pid in $(WAYLAND_DISPLAY=$wl lock_pids); do kill -9 "$pid" 2>/dev/null; done
+  fi
+  kill "$hpid" 2>/dev/null
+  for _ in $(seq 20); do kill -0 "$hpid" 2>/dev/null || break; sleep 0.1; done
+  kill -9 "$hpid" 2>/dev/null
+  [ -n "$sig" ] && rm -rf "${XDG_RUNTIME_DIR:?}/hypr/$sig"
+  rm -rf "$tmp"
+}
+trap cleanup EXIT
+
+for _ in $(seq 100); do
+  instance=$(timeout 1 hyprctl instances -j 2>/dev/null | jq -c ".[] | select(.pid == $hpid)")
+  [ -n "$instance" ] && break
+  kill -0 "$hpid" 2>/dev/null || break
+  sleep 0.1
+done
+if [ -z "${instance:-}" ]; then
+  echo "nested-hyprland: Hyprland did not start; log:" >&2
+  tail -20 "$tmp/hyprland.log" >&2
+  exit 2
+fi
+sig=$(jq -r .instance <<<"$instance")
+wl=$(jq -r .wl_socket <<<"$instance")
+
+WAYLAND_DISPLAY=$wl HYPRLAND_INSTANCE_SIGNATURE=$sig "$@"
