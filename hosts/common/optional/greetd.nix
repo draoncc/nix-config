@@ -22,11 +22,18 @@ let
       exec '${vars} ${command} -l debug; ${pkgs.sway}/bin/swaymsg exit'
     ''}";
 
+  # start-hyprland looks up `Hyprland --version-json` on PATH (ignoring --path),
+  # and the greeter user has no Hyprland there.
   hyprland =
     command:
-    "${pkgs.hyprland}/bin/Hyprland --config ${pkgs.writeText "hyprland.conf" ''
-      ${vars} ${command}; hyprctl dispatch exit
-    ''}";
+    toString (
+      pkgs.writeShellScript "greeter-hyprland" ''
+        export PATH=${pkgs.hyprland}/bin:$PATH
+        exec start-hyprland -- --config ${pkgs.writeText "hyprland.conf" ''
+          exec-once = ${vars} ${command}; hyprctl dispatch exit
+        ''} "$@"
+      ''
+    );
 
   cinoCfg = homeCfgs.cino;
 in
