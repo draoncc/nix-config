@@ -3,9 +3,11 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+
+{
   users.users.greeter = {
-    extraGroups = ["seat"];
+    extraGroups = [ "seat" ];
   };
   services = {
     seatd.enable = true;
@@ -16,7 +18,9 @@
     displayManager = {
       enable = true;
       # Export user sessions to system
-      sessionPackages = lib.flatten (lib.mapAttrsToList (_: v: v.home.exportedSessionPackages) config.home-manager.users);
+      sessionPackages = lib.flatten (
+        lib.mapAttrsToList (_: v: v.home.exportedSessionPackages) config.home-manager.users
+      );
     };
   };
 }

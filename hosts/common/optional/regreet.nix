@@ -3,10 +3,12 @@
   lib,
   config,
   ...
-}: let
+}:
+let
   cfg = config.services.displayManager.regreet;
   xkb = config.services.xserver.xkb;
-in {
+in
+{
   # cage only reads its keymap from XKB_DEFAULT_* env vars, which the upstream
   # module's command doesn't set; services.xserver.xkb alone isn't enough.
   services.greetd.settings.default_session.command = lib.concatStringsSep " " [
@@ -21,7 +23,12 @@ in {
 
   services.displayManager.regreet = {
     enable = true;
-    cageArgs = ["-d" "-s" "-m" "last"];
+    cageArgs = [
+      "-d"
+      "-s"
+      "-m"
+      "last"
+    ];
     iconTheme = {
       name = "Papirus-Dark";
       package = pkgs.papirus-icon-theme;

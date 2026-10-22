@@ -1,8 +1,8 @@
-{lib, ...}: {
+{ lib, ... }: {
   options = {
     home.exportedSessionPackages = lib.mkOption {
       type = lib.types.listOf lib.types.pathInStore;
-      default = [];
+      default = [ ];
     };
   };
 }
