@@ -1,5 +1,7 @@
 { config, lib, ... }:
 let
+  inherit (import ./lua.nix { inherit lib; }) keys bind exec;
+
   # With no declared monitors, draw once across all of them (monitor = "")
   monitors =
     if config.monitors != [ ] then
@@ -82,8 +84,8 @@ in
           hyprlock = lib.getExe config.programs.hyprlock.package;
         in
         [
-          "SUPER,backspace,exec,${hyprlock}"
-          "SUPER,XF86Calculator,exec,${hyprlock}"
+          (bind (keys [ "SUPER" ] "backspace") (exec hyprlock))
+          (bind (keys [ "SUPER" ] "XF86Calculator") (exec hyprlock))
         ];
     };
   };

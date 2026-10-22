@@ -1,5 +1,7 @@
 { lib, ... }:
 let
+  inherit (import ./lua.nix { inherit lib; }) keys bind bindWith;
+
   workspaces = (map (n: "F${toString n}") (lib.range 1 12));
   # ++ (map toString (lib.range 0 9));
   mod = "ALT";
@@ -17,74 +19,71 @@ let
   };
 
   # Map keys to hyprland directions
-  directions = rec {
-    # left = "l";
-    # right = "r";
-    # up = "u";
-    # down = "d";
+  directions = {
     d = "l"; # left
     n = "r"; # right
     t = "u"; # up
     h = "d"; # down
   };
+
+  directionBinds =
+    mods: dispatcher:
+    lib.mapAttrsToList (key: direction: bind (keys mods key) (dispatcher direction)) directions;
 in
 {
-  wayland.windowManager.hyprland.configType = "hyprlang";
   wayland.windowManager.hyprland.settings = {
-    bindm = [
-      "${mod},mouse:272,movewindow"
-      "${mod},mouse:273,resizewindow"
-    ];
-
     bind =
       with keymaps;
       [
-        "${mod}SHIFT,${q},killactive"
-        "${mod}SHIFT,${e},exit"
+        (bindWith (keys [ mod ] "mouse:272") "hl.dsp.window.drag()" { mouse = true; })
+        (bindWith (keys [ mod ] "mouse:273") "hl.dsp.window.resize()" { mouse = true; })
 
-        "${mod},${s},layoutmsg,togglesplit"
-        "${mod},${f},fullscreen,1"
-        "${mod}SHIFT,${f},fullscreen,0"
-        "${mod}SHIFT,space,togglefloating"
+        (bind (keys [ mod "SHIFT" ] q) "hl.dsp.window.close()")
+        (bind (keys [ mod "SHIFT" ] e) "hl.dsp.exit()")
 
-        "${mod},${minus},layoutmsg,splitratio -0.25"
-        "${mod}SHIFT,${minus},layoutmsg,splitratio -0.3333333"
+        (bind (keys [ mod ] s) ''hl.dsp.layout("togglesplit")'')
+        (bind (keys [ mod ] f) ''hl.dsp.window.fullscreen({ mode = "maximized" })'')
+        (bind (keys [ mod "SHIFT" ] f) ''hl.dsp.window.fullscreen({ mode = "fullscreen" })'')
+        (bind (keys [ mod "SHIFT" ] "space") "hl.dsp.window.float()")
 
-        "${mod},${equal},layoutmsg,splitratio 0.25"
-        "${mod}SHIFT,${equal},layoutmsg,splitratio 0.3333333"
+        (bind (keys [ mod ] minus) ''hl.dsp.layout("splitratio -0.25")'')
+        (bind (keys [ mod "SHIFT" ] minus) ''hl.dsp.layout("splitratio -0.3333333")'')
 
-        "${mod},${g},togglegroup"
-        "${mod},${t},lockactivegroup,toggle"
-        "${mod},${apostrophe},changegroupactive,f"
-        "${mod}SHIFT,${apostrophe},changegroupactive,b"
+        (bind (keys [ mod ] equal) ''hl.dsp.layout("splitratio 0.25")'')
+        (bind (keys [ mod "SHIFT" ] equal) ''hl.dsp.layout("splitratio 0.3333333")'')
 
-        "${mod},${u},togglespecialworkspace"
-        "${mod}SHIFT,${u},movetoworkspace,special"
+        (bind (keys [ mod ] g) "hl.dsp.group.toggle()")
+        (bind (keys [ mod ] t) "hl.dsp.group.lock()")
+        (bind (keys [ mod ] apostrophe) "hl.dsp.group.next()")
+        (bind (keys [ mod "SHIFT" ] apostrophe) "hl.dsp.group.prev()")
+
+        (bind (keys [ mod ] u) "hl.dsp.workspace.toggle_special()")
+        (bind (keys [ mod "SHIFT" ] u) ''hl.dsp.window.move({ workspace = "special" })'')
       ]
       ++
         # Change workspace
-        (map (n: "${mod},${n},workspace,name:${n}") workspaces)
+        (map (n: bind (keys [ mod ] n) ''hl.dsp.focus({ workspace = "name:${n}" })'') workspaces)
       ++
         # Move window to workspace
-        (map (n: "${mod}SHIFT,${n},movetoworkspacesilent,name:${n}") workspaces)
+        (map (
+          n: bind (keys [ mod "SHIFT" ] n) ''hl.dsp.window.move({ workspace = "name:${n}", follow = false })''
+        ) workspaces)
       ++
         # Move focus
-        (lib.mapAttrsToList (key: direction: "${mod},${key},movefocus,${direction}") directions)
+        (directionBinds [ mod ] (d: ''hl.dsp.focus({ direction = "${d}" })''))
       ++
         # Swap windows
-        (lib.mapAttrsToList (key: direction: "${mod}SHIFT,${key},swapwindow,${direction}") directions)
+        (directionBinds [ mod "SHIFT" ] (d: ''hl.dsp.window.swap({ direction = "${d}" })''))
       ++
         # Move windows
-        (lib.mapAttrsToList (
-          key: direction: "${mod}CONTROL,${key},movewindoworgroup,${direction}"
-        ) directions)
+        (directionBinds [ mod "CONTROL" ] (
+          d: ''hl.dsp.window.move({ direction = "${d}", group_aware = true })''
+        ))
       ++
         # Move monitor focus
-        (lib.mapAttrsToList (key: direction: "${mod}ALT,${key},focusmonitor,${direction}") directions)
+        (directionBinds [ mod "ALT" ] (d: ''hl.dsp.focus({ monitor = "${d}" })''))
       ++
         # Move workspace to other monitor
-        (lib.mapAttrsToList (
-          key: direction: "${mod}ALTSHIFT,${key},movecurrentworkspacetomonitor,${direction}"
-        ) directions);
+        (directionBinds [ mod "ALT" "SHIFT" ] (d: ''hl.dsp.workspace.move({ monitor = "${d}" })''));
   };
 }

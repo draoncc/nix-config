@@ -6,6 +6,12 @@
 }:
 
 let
+  inherit (import ./lua.nix { inherit lib; })
+    keys
+    bind
+    exec
+    ;
+
   mod = "ALT";
   keymaps = {
     e = "code:26";
@@ -45,22 +51,23 @@ let
     ${pkgs.systemd}/bin/systemctl --user stop hyprland-session.target graphical-session.target
   '';
   hyprSession =
-    pkgs.runCommandLocal "hyprland-session" {
-      passthru.providedSessions = ["hyprland"];
-    } ''
-      mkdir -p $out/share/wayland-sessions
-      substitute \
-        ${hyprPackage}/share/wayland-sessions/hyprland.desktop \
-        $out/share/wayland-sessions/hyprland.desktop \
-        --replace-fail ${hyprPackage}/bin/start-hyprland ${hyprSessionLauncher}
-    '';
+    pkgs.runCommandLocal "hyprland-session"
+      {
+        passthru.providedSessions = [ "hyprland" ];
+      }
+      ''
+        mkdir -p $out/share/wayland-sessions
+        substitute \
+          ${hyprPackage}/share/wayland-sessions/hyprland.desktop \
+          $out/share/wayland-sessions/hyprland.desktop \
+          --replace-fail ${hyprPackage}/bin/start-hyprland ${hyprSessionLauncher}
+      '';
 in
 {
   imports = [
     ../wayland-wm
 
     ./basic-binds.nix
-    ./systemd-fixes.nix
     ./hyprbars.nix
     ./hyprlock.nix
     ./hypridle.nix
@@ -72,7 +79,7 @@ in
     pkgs.hyprpicker
   ];
 
-  home.exportedSessionPackages = [hyprSession];
+  home.exportedSessionPackages = [ hyprSession ];
 
   home.pointerCursor.hyprcursor.enable = true;
 
@@ -93,77 +100,168 @@ in
   wayland.windowManager.hyprland = {
     enable = true;
     package = pkgs.inputs.hyprland.hyprland;
+    # Hyprland (git) only reads hyprland.lua; hyprland.conf is ignored.
+    configType = "lua";
 
     settings = {
-      general = {
-        gaps_in = 15;
-        gaps_out = 20;
-        border_size = 3;
-        # cursor_inactive_timeout = 4;
-        "col.active_border" = "0xff${config.colorscheme.palette.base0C}";
-        "col.inactive_border" = "0xff${config.colorscheme.palette.base02}";
-      };
-
-      dwindle = {
-        split_width_multiplier = 1.35;
-        # "col.group_border_active" = "0xff${config.colorscheme.palette.base0B}";
-        # "col.group_border" = "0xff${config.colorscheme.palette.base04}";
-      };
-
-      input = {
-        kb_layout = "us";
-        kb_variant = "dvp";
-        kb_options = "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
-        touchpad.disable_while_typing = false;
-      };
-
-      debug.vfr = true;
-
-      decoration = {
-        active_opacity = 0.92;
-        inactive_opacity = 0.75;
-        fullscreen_opacity = 1.0;
-        rounding = 5;
-        blur = {
-          enabled = true;
-          size = 5;
-          passes = 3;
-          new_optimizations = true;
-          ignore_opacity = true;
+      config = {
+        general = {
+          gaps_in = 15;
+          gaps_out = 20;
+          border_size = 3;
+          col = {
+            active_border = "rgb(${config.colorscheme.palette.base0C})";
+            inactive_border = "rgb(${config.colorscheme.palette.base02})";
+          };
         };
-        shadow = {
-          enabled = true;
-          range = 12;
-          offset = "3 3";
-          color = "0x44000000";
-          color_inactive = "0x66000000";
+
+        dwindle = {
+          split_width_multiplier = 1.35;
         };
+
+        input = {
+          kb_layout = "us";
+          kb_variant = "dvp";
+          kb_options = "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
+          touchpad.disable_while_typing = false;
+        };
+
+        debug.vfr = true;
+
+        decoration = {
+          active_opacity = 0.92;
+          inactive_opacity = 0.75;
+          fullscreen_opacity = 1.0;
+          rounding = 5;
+          blur = {
+            enabled = true;
+            size = 5;
+            passes = 3;
+            new_optimizations = true;
+            ignore_opacity = true;
+          };
+          shadow = {
+            enabled = true;
+            range = 12;
+            offset = "3 3";
+            color = "rgba(00000044)";
+            color_inactive = "rgba(00000066)";
+          };
+        };
+
+        animations.enabled = true;
       };
 
-      animations = {
-        enabled = true;
-        bezier = [
-          "easein,0.32, 0, 0.67, 0" # cubic
-          "easeout,0.33, 1, 0.68, 1" # cubic
-          "easeinback,0.36, 0, 0.66, -0.56"
-          "easeoutback,0.34, 1.56, 0.64, 1"
-        ];
+      curve =
+        lib.mapAttrsToList
+          (name: points: {
+            _args = [
+              name
+              {
+                type = "bezier";
+                inherit points;
+              }
+            ];
+          })
+          {
+            easein = [
+              [
+                0.32
+                0
+              ]
+              [
+                0.67
+                0
+              ]
+            ]; # cubic
+            easeout = [
+              [
+                0.33
+                1
+              ]
+              [
+                0.68
+                1
+              ]
+            ]; # cubic
+            easeinback = [
+              [
+                0.36
+                0
+              ]
+              [
+                0.66
+                (-0.56)
+              ]
+            ];
+            easeoutback = [
+              [
+                0.34
+                1.56
+              ]
+              [
+                0.64
+                1
+              ]
+            ];
+          };
 
-        animation = [
-          "windowsIn,1,1,easeout,slide"
-          "windowsOut,1,1,easein,slide"
-          "windowsMove,1,1,easeout"
-          "workspaces,1,2,easeout,slide"
-          "fadeIn,1,1,easeout"
-          "fadeOut,1,1,easein"
-          "fadeSwitch,1,1,easeout"
-          "fadeShadow,1,1,easeout"
-          "fadeDim,1,1,easeout"
-          "border,1,1,easeout"
-        ];
-      };
-
-      exec = [ "${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill" ];
+      animation =
+        map
+          (
+            a:
+            {
+              enabled = true;
+              speed = 1;
+            }
+            // a
+          )
+          [
+            {
+              leaf = "windowsIn";
+              bezier = "easeout";
+              style = "slide";
+            }
+            {
+              leaf = "windowsOut";
+              bezier = "easein";
+              style = "slide";
+            }
+            {
+              leaf = "windowsMove";
+              bezier = "easeout";
+            }
+            {
+              leaf = "workspaces";
+              speed = 2;
+              bezier = "easeout";
+              style = "slide";
+            }
+            {
+              leaf = "fadeIn";
+              bezier = "easeout";
+            }
+            {
+              leaf = "fadeOut";
+              bezier = "easein";
+            }
+            {
+              leaf = "fadeSwitch";
+              bezier = "easeout";
+            }
+            {
+              leaf = "fadeShadow";
+              bezier = "easeout";
+            }
+            {
+              leaf = "fadeDim";
+              bezier = "easeout";
+            }
+            {
+              leaf = "border";
+              bezier = "easeout";
+            }
+          ];
 
       bind =
         let
@@ -187,97 +285,121 @@ in
           terminal = config.home.sessionVariables.TERMINAL;
           browser = defaultApp "x-scheme-handler/https";
           editor = defaultApp "text/plain";
+
+          execBind =
+            mods: key: cmd:
+            bind (keys mods key) (exec cmd);
         in
         with keymaps;
         [
           # Program bindings
-          "${mod},Return,exec,${terminal}"
-          "${mod},${e},exec,${editor}"
-          "${mod},${v},exec,${editor}"
-          "${mod},${b},exec,${browser}"
+          (execBind [ mod ] "Return" terminal)
+          (execBind [ mod ] e editor)
+          (execBind [ mod ] v editor)
+          (execBind [ mod ] b browser)
 
           # Brightness control (only works if the system has brightnessctl)
-          ",XF86MonBrightnessUp,exec,brightnessctl s +10%; ${swayosd.brightness}"
-          ",XF86MonBrightnessDown,exec,brightnessctl s -10%; ${swayosd.brightness}"
+          (execBind [ ] "XF86MonBrightnessUp" "brightnessctl s +10%; ${swayosd.brightness}")
+          (execBind [ ] "XF86MonBrightnessDown" "brightnessctl s -10%; ${swayosd.brightness}")
 
           # Volume
-          ",XF86AudioRaiseVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ +5%; ${swayosd.output-volume}"
-          ",XF86AudioLowerVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ -5%; ${swayosd.output-volume}"
-          ",XF86AudioMute,exec,${pactl} set-sink-mute @DEFAULT_SINK@ toggle; ${swayosd.output-volume}"
-          "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
-          ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
+          (execBind [ ] "XF86AudioRaiseVolume"
+            "${pactl} set-sink-volume @DEFAULT_SINK@ +5%; ${swayosd.output-volume}"
+          )
+          (execBind [ ] "XF86AudioLowerVolume"
+            "${pactl} set-sink-volume @DEFAULT_SINK@ -5%; ${swayosd.output-volume}"
+          )
+          (execBind [ ] "XF86AudioMute"
+            "${pactl} set-sink-mute @DEFAULT_SINK@ toggle; ${swayosd.output-volume}"
+          )
+          (execBind [
+            "SHIFT"
+          ] "XF86AudioMute" "${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}")
+          (execBind [ ] "XF86AudioMicMute"
+            "${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
+          )
 
           # Screenshotting
-          ",Print,exec,${grimblast} --notify --freeze copy output"
-          "SHIFT,Print,exec,${grimblast} --notify --freeze copy active"
-          "CONTROL,Print,exec,${grimblast} --notify --freeze copy screen"
-          "${mod},Print,exec,${grimblast} --notify --freeze copy area"
-          "ALT,Print,exec,${grimblast} --notify --freeze copy area"
+          (execBind [ ] "Print" "${grimblast} --notify --freeze copy output")
+          (execBind [ "SHIFT" ] "Print" "${grimblast} --notify --freeze copy active")
+          (execBind [ "CONTROL" ] "Print" "${grimblast} --notify --freeze copy screen")
+          (execBind [ mod ] "Print" "${grimblast} --notify --freeze copy area")
+
+          # Passthrough mode (e.g. for VNC)
+          (bind (keys [ mod ] P) ''hl.dsp.submap("passthrough")'')
         ]
         ++
 
           (lib.optionals config.services.playerctld.enable [
             # Media control
-            ",XF86AudioNext,exec,${playerctl} next"
-            ",XF86AudioPrev,exec,${playerctl} previous"
-            ",XF86AudioPlay,exec,${playerctl} play-pause"
-            ",XF86AudioStop,exec,${playerctl} stop"
-            "ALT,XF86AudioNext,exec,${playerctld} shift"
-            "ALT,XF86AudioPrev,exec,${playerctld} unshift"
-            "ALT,XF86AudioPlay,exec,systemctl --user restart playerctld"
+            (execBind [ ] "XF86AudioNext" "${playerctl} next")
+            (execBind [ ] "XF86AudioPrev" "${playerctl} previous")
+            (execBind [ ] "XF86AudioPlay" "${playerctl} play-pause")
+            (execBind [ ] "XF86AudioStop" "${playerctl} stop")
+            (execBind [ "ALT" ] "XF86AudioNext" "${playerctld} shift")
+            (execBind [ "ALT" ] "XF86AudioPrev" "${playerctld} unshift")
+            (execBind [ "ALT" ] "XF86AudioPlay" "systemctl --user restart playerctld")
           ])
         ++
 
           # Screen lock
           (lib.optionals config.programs.swaylock.enable [
-            ",XF86Launch5,exec,${swaylock} -i ${config.wallpaper}"
-            ",XF86Launch4,exec,${swaylock} -i ${config.wallpaper}"
-            "${mod},backspace,exec,${swaylock} -i ${config.wallpaper}"
+            (execBind [ ] "XF86Launch5" "${swaylock} -i ${config.wallpaper}")
+            (execBind [ ] "XF86Launch4" "${swaylock} -i ${config.wallpaper}")
+            (execBind [ mod ] "backspace" "${swaylock} -i ${config.wallpaper}")
           ])
         ++
 
           # Notification manager
-          (lib.optionals config.services.mako.enable [ "${mod},${keymaps.w},exec,${makoctl} dismiss" ])
+          (lib.optionals config.services.mako.enable [ (execBind [ mod ] keymaps.w "${makoctl} dismiss") ])
         ++
 
           # Launcher
           (
             lib.optionals config.programs.wofi.enable [
-              "${mod},${keymaps.x},exec,${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
-              "${mod},${keymaps.d},exec,${wofi} -S run"
+              (execBind [ mod ] keymaps.x "${wofi} -S drun -x 10 -y 10 -W 25% -H 60%")
+              (execBind [ mod ] keymaps.d "${wofi} -S run")
             ]
             ++ (lib.optionals config.programs.password-store.enable [
-              ",Scroll_Lock,exec,${pass-wofi}" # fn+k
-              ",XF86Calculator,exec,${pass-wofi}" # fn+f12
-              "${mod},${keymaps.semicolon},exec,pass-wofi"
+              (execBind [ ] "Scroll_Lock" pass-wofi) # fn+k
+              (execBind [ ] "XF86Calculator" pass-wofi) # fn+f12
+              (execBind [ mod ] keymaps.semicolon "pass-wofi")
             ])
           );
 
       monitor =
         map (
           m:
-          "${m.name},${
+          {
+            output = m.name;
+          }
+          // (
             if m.enabled then
-              "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},${toString m.scale}"
+              {
+                mode = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
+                inherit (m) position scale;
+              }
             else
-              "disable"
-          }"
-        ) (config.monitors)
+              { disabled = true; }
+          )
+        ) config.monitors
         # Fallback for monitors not declared above (e.g. a newly plugged-in display)
-        ++ [ ",preferred,auto,1" ];
+        ++ [
+          {
+            output = "";
+            mode = "preferred";
+            position = "auto";
+            scale = 1;
+          }
+        ];
 
-      workspace = map (m: "${m.name},${m.workspace}") (
-        lib.filter (m: m.enabled && m.workspace != null) config.monitors
-      );
+      workspace_rule = map (m: {
+        inherit (m) workspace;
+        monitor = m.name;
+        default = true;
+      }) (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
     };
 
-    # This is order sensitive, so it has to come here.
-    extraConfig = with keymaps; ''
-      # Passthrough mode (e.g. for VNC)
-      bind=${mod},${P},submap,passthrough
-      submap=passthrough
-      bind=${mod},${P},submap,reset
-      submap=reset
-    '';
+    submaps.passthrough.settings.bind = [ (bind (keys [ mod ] keymaps.P) ''hl.dsp.submap("reset")'') ];
   };
 }
