@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (import ./lua.nix { inherit lib; }) hyprctlDispatch;
+  inherit (import ./lua.nix { inherit lib; }) hyprctlDispatch toLua;
   dpmsOn = hyprctlDispatch ''hl.dsp.dpms({ action = "on" })'';
   dpmsOff = hyprctlDispatch ''hl.dsp.dpms({ action = "off" })'';
 
@@ -21,18 +21,28 @@ let
   );
 in
 {
+  # One hypridle per Hyprland session, started by the compositor rather than
+  # as a systemd user service. The user manager is shared by every tty, and
+  # each login restarts hyprland-session.target: a hypridle.service would be
+  # moved to the newest session, leaving older ones with no idle locking.
+  wayland.windowManager.hyprland.extraConfig = ''
+    hl.on("hyprland.start", function()
+      hl.exec_cmd(${toLua (lib.getExe pkgs.hypridle)})
+    end)
+  '';
+
   services.hypridle = {
     enable = true;
+    package = null; # No systemd unit; see above
     settings =
       let
         isDischarging = "grep Discharging /sys/class/power_supply/BAT{0,1}/status -q";
       in
       {
         general = {
-          # Run hyprlock in its own scope, outside hypridle.service's cgroup.
-          # Logging in on another tty restarts hyprland-session.target, which
-          # stops hypridle; a hyprlock in its cgroup would be killed with it,
-          # leaving that session locked with no lock client to accept input.
+          # Run hyprlock in its own scope so hypridle stopping (or being
+          # stopped) never takes the lock client down with it: that leaves the
+          # session locked with nothing to accept input.
           lock_cmd = "if ! ${isLocked}; then systemd-run --user --scope --collect --quiet ${lib.getExe config.programs.hyprlock.package} --grace 5; fi";
           before_sleep_cmd = "loginctl lock-session";
           after_sleep_cmd = dpmsOn;
