@@ -51,8 +51,5 @@ hyprlock-check HOST=hostname:
 test:
     sudo nixos-rebuild --flake .#{{hostname}} test
 
-build:
+switch:
     sudo nixos-rebuild --flake .#{{hostname}} switch
-
-upgrade:
-    sudo nixos-rebuild --flake .#{{hostname}} switch --upgrade
