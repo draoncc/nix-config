@@ -1,1 +1,11 @@
-{ pkgs, ... }: { home.packages = [ pkgs.google-chrome ]; }
+{ pkgs, ... }:
+
+{
+  home.packages = with pkgs; [ google-chrome ];
+
+  home.persistence."/persist" = {
+    directories = [
+      ".config/google-chrome"
+    ];
+  };
+}
