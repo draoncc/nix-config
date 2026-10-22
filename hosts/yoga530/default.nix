@@ -21,6 +21,7 @@
     ../common/optional/battery.nix
     ../common/optional/bluetooth.nix
     ../common/optional/docker.nix
+    ../common/optional/quietboot.nix
 
     ../common/users/cino
   ];
