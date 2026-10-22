@@ -43,6 +43,6 @@ in
 
   services.greetd = {
     enable = true;
-    settings.default_session.command = hyprland (lib.getExe config.programs.regreet.package);
+    settings.default_session.command = hyprland (lib.getExe config.services.displayManager.regreet.package);
   };
 }
