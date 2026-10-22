@@ -5,7 +5,11 @@
     package = lib.mkDefault pkgs.nix;
     settings = {
       # Add user features without overriding the system's enabled features.
-      extra-experimental-features = [ "nix-command" "flakes" "ca-derivations" ];
+      extra-experimental-features = [
+        "nix-command"
+        "flakes"
+        "ca-derivations"
+      ];
       warn-dirty = false;
     };
   };

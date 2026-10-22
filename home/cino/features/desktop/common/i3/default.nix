@@ -6,8 +6,13 @@ let
   down = "t";
   up = "n";
   right = "s";
-in {
-  imports = [ ./rofi ./polybar ./picom ];
+in
+{
+  imports = [
+    ./rofi
+    ./polybar
+    ./picom
+  ];
 
   home.packages = with pkgs; [ xsecurelock ];
 
@@ -75,16 +80,15 @@ in {
       };
 
       assigns = {
-        "2" = [{ class = "^Google Chrome$"; }];
-        "3" = [{ class = "^wezterm$"; }];
+        "2" = [ { class = "^Google Chrome$"; } ];
+        "3" = [ { class = "^wezterm$"; } ];
       };
 
       keybindings = lib.mkDefault {
         "${mod}+Return" = "exec $TERMINAL";
         "${mod}+e" = ''exec "$HOME/.config/rofi/scripts/launcher.sh"'';
         "${mod}+l" = "exec xsecurelock";
-        "${mod}+c" =
-          ''exec "rofi -show calc -modi calc -no-show-match -no-sort"'';
+        "${mod}+c" = ''exec "rofi -show calc -modi calc -no-show-match -no-sort"'';
         "${mod}+Control+s" = "exec rofi-screenshot";
         "${mod}+v" = ''exec "rofi -modi emoji -show emoji"'';
 

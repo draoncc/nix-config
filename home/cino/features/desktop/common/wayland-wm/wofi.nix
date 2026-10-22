@@ -1,4 +1,10 @@
-{ config, lib, pkgs, ... }: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
   programs.wofi = {
     enable = true;
     package = pkgs.wofi.overrideAttrs (oa: {
@@ -19,6 +25,9 @@
     };
   };
 
-  home.packages = let inherit (config.programs.password-store) package enable;
-  in lib.optional enable (pkgs.pass-wofi.override { pass = package; });
+  home.packages =
+    let
+      inherit (config.programs.password-store) package enable;
+    in
+    lib.optional enable (pkgs.pass-wofi.override { pass = package; });
 }

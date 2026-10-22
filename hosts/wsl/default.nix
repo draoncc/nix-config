@@ -7,7 +7,8 @@
 {
   networking.hostName = "wsl";
 
-  imports = [ # Include the results of the hardware scan.
+  imports = [
+    # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./fix-user-runtime-dir.nix
 

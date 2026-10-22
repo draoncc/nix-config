@@ -1,7 +1,9 @@
 { config, pkgs, ... }:
 
-let inherit (config) colorscheme;
-in {
+let
+  inherit (config) colorscheme;
+in
+{
   home.sessionVariables.COLORTERM = "truecolor";
   home.packages = with pkgs; [ netcat-gnu ]; # godot language server
   programs.helix = {
@@ -9,7 +11,7 @@ in {
     defaultEditor = true;
 
     settings = {
-      theme = "${builtins.replaceStrings ["-"] ["_"] colorscheme.slug}";
+      theme = "${builtins.replaceStrings [ "-" ] [ "_" ] colorscheme.slug}";
 
       editor = {
         color-modes = true;
@@ -28,13 +30,18 @@ in {
     languages = {
       language-server.godot = {
         command = "${pkgs.netcat-gnu}/bin/nc";
-        args = [ "127.0.0.1" "6005"];
+        args = [
+          "127.0.0.1"
+          "6005"
+        ];
       };
 
-      language = [{
-        name = "gdscript";
-        language-servers = [ "godot" ];
-      }];
+      language = [
+        {
+          name = "gdscript";
+          language-servers = [ "godot" ];
+        }
+      ];
     };
   };
 }

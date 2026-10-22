@@ -59,23 +59,27 @@
     }@inputs:
     let
       inherit (self) outputs;
-      lib = let
-        base = nixpkgs.lib // home-manager.lib;
-      in base // {
-        toSystemdDevice = device:
-          base.concatStringsSep "-" (
-            base.tail (map (base.replaceString "-" "\\x2d") (base.splitString "/" device))
-          )
-          + ".device";
-      };
+      lib =
+        let
+          base = nixpkgs.lib // home-manager.lib;
+        in
+        base
+        // {
+          toSystemdDevice =
+            device:
+            base.concatStringsSep "-" (
+              base.tail (map (base.replaceString "-" "\\x2d") (base.splitString "/" device))
+            )
+            + ".device";
+        };
       systems = [ "x86_64-linux" ];
       forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
       pkgsFor = lib.genAttrs systems (
         system:
-          import nixpkgs {
-            inherit system;
-            config.allowUnfree = true;
-          }
+        import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        }
       );
     in
     {
@@ -91,7 +95,10 @@
       nixosConfigurations = {
         # Asus Chromebook
         c302 = lib.nixosSystem {
-          modules = [ ./hosts/c302 { _module.args.disk = "/dev/mmcblk0"; } ];
+          modules = [
+            ./hosts/c302
+            { _module.args.disk = "/dev/mmcblk0"; }
+          ];
           specialArgs = { inherit inputs outputs; };
         };
 
@@ -105,7 +112,10 @@
         # Lenovo Yoga
         yoga530 = lib.nixosSystem {
           system = "x86_64-linux";
-          modules = [ ./hosts/yoga530 { _module.args.disk = "/dev/disk/by-id/nvme-SAMSUNG_MZVLW128HEGR-000L2_S35FNX0K439214"; } ];
+          modules = [
+            ./hosts/yoga530
+            { _module.args.disk = "/dev/disk/by-id/nvme-SAMSUNG_MZVLW128HEGR-000L2_S35FNX0K439214"; }
+          ];
           specialArgs = { inherit inputs outputs; };
         };
       };

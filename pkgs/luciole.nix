@@ -1,4 +1,8 @@
-{ lib, stdenvNoCC, fetchzip }:
+{
+  lib,
+  stdenvNoCC,
+  fetchzip,
+}:
 
 stdenvNoCC.mkDerivation rec {
   pname = "luciole";
@@ -23,8 +27,7 @@ stdenvNoCC.mkDerivation rec {
   '';
 
   meta = with lib; {
-    description =
-      "A typeface developed explicitly for visually impaired people.";
+    description = "A typeface developed explicitly for visually impaired people.";
     homepage = "https://www.luciole-vision.com/luciole-en.html";
     license = licenses.cc-by-40;
     platforms = platforms.all;

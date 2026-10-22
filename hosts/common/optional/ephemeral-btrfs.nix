@@ -4,7 +4,8 @@
   config,
   outputs,
   ...
-}: let
+}:
+let
   root = config.fileSystems."/";
 
   wipeScript = ''
@@ -29,16 +30,17 @@
 
   rootDeviceUnit = outputs.lib.toSystemdDevice root.device;
   phase1Systemd = config.boot.initrd.systemd.enable;
-in {
+in
+{
   boot.initrd = {
-    supportedFilesystems = ["btrfs"];
+    supportedFilesystems = [ "btrfs" ];
     postDeviceCommands = lib.mkIf (!phase1Systemd) (lib.mkBefore wipeScript);
     systemd.services.restore-root = lib.mkIf phase1Systemd {
       description = "Rollback btrfs rootfs";
-      wantedBy = ["initrd.target"];
-      requires = [rootDeviceUnit];
-      after = [rootDeviceUnit];
-      before = ["sysroot.mount"];
+      wantedBy = [ "initrd.target" ];
+      requires = [ rootDeviceUnit ];
+      after = [ rootDeviceUnit ];
+      before = [ "sysroot.mount" ];
       unitConfig.DefaultDependencies = "no";
       serviceConfig.Type = "oneshot";
       script = wipeScript;

@@ -1,10 +1,17 @@
-{ inputs, lib, config, outputs, ... }:
+{
+  inputs,
+  lib,
+  config,
+  outputs,
+  ...
+}:
 
 {
   imports = [
     inputs.nix-colors.homeManagerModule
     ./nix.nix
-  ] ++ (builtins.attrValues outputs.homeManagerModules);
+  ]
+  ++ (builtins.attrValues outputs.homeManagerModules);
 
   nixpkgs = {
     overlays = builtins.attrValues outputs.overlays;
@@ -25,7 +32,9 @@
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "25.05";
     sessionPath = [ "$HOME/.local/bin" ];
-    sessionVariables = { FLAKE = "$HOME/Documents/NixConfig"; };
+    sessionVariables = {
+      FLAKE = "$HOME/Documents/NixConfig";
+    };
     preferXdgDirectories = true;
 
     persistence = {

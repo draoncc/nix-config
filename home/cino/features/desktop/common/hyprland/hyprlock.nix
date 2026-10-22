@@ -1,10 +1,18 @@
-{config, lib, ...}: let
+{ config, lib, ... }:
+let
   # With no declared monitors, draw once across all of them (monitor = "")
   monitors =
-    if config.monitors != [ ]
-    then config.monitors
-    else [{ name = ""; scale = 1.0; }];
-in {
+    if config.monitors != [ ] then
+      config.monitors
+    else
+      [
+        {
+          name = "";
+          scale = 1.0;
+        }
+      ];
+in
+{
   programs.hyprlock = {
     enable = true;
     settings = {
@@ -44,35 +52,39 @@ in {
         check_color = "rgba(00000000)";
         fail_color = "rgba(00000000)";
       });
-      label = lib.flatten (lib.forEach monitors (monitor: [
-        {
-          monitor = monitor.name;
-          text = "$TIME";
-          color = "rgb(${lib.removePrefix "#" config.colorscheme.palette.base01})";
-          font_family = config.fontProfiles.regular.family;
-          font_size = toString (builtins.floor (140 * monitor.scale));
-          position = "0 0";
-        }
-        {
-          monitor = monitor.name;
-          text = "$FAIL";
-          color = "rgb(${lib.removePrefix "#" config.colorscheme.palette.base01})";
-          font_family = config.fontProfiles.regular.family;
-          font_size = toString (builtins.floor (18 * monitor.scale));
-          position = "0, -40%";
-        }
-      ]));
+      label = lib.flatten (
+        lib.forEach monitors (monitor: [
+          {
+            monitor = monitor.name;
+            text = "$TIME";
+            color = "rgb(${lib.removePrefix "#" config.colorscheme.palette.base01})";
+            font_family = config.fontProfiles.regular.family;
+            font_size = toString (builtins.floor (140 * monitor.scale));
+            position = "0 0";
+          }
+          {
+            monitor = monitor.name;
+            text = "$FAIL";
+            color = "rgb(${lib.removePrefix "#" config.colorscheme.palette.base01})";
+            font_family = config.fontProfiles.regular.family;
+            font_size = toString (builtins.floor (18 * monitor.scale));
+            position = "0, -40%";
+          }
+        ])
+      );
     };
   };
 
   wayland.windowManager.hyprland = {
     settings = {
-      bind = let
-        hyprlock = lib.getExe config.programs.hyprlock.package;
-      in [
-        "SUPER,backspace,exec,${hyprlock}"
-        "SUPER,XF86Calculator,exec,${hyprlock}"
-      ];
+      bind =
+        let
+          hyprlock = lib.getExe config.programs.hyprlock.package;
+        in
+        [
+          "SUPER,backspace,exec,${hyprlock}"
+          "SUPER,XF86Calculator,exec,${hyprlock}"
+        ];
     };
   };
 }

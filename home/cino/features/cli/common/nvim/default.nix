@@ -1,7 +1,10 @@
 { pkgs, lib, ... }:
 
 {
-  imports = [ ./lsp.nix ./ui.nix ];
+  imports = [
+    ./lsp.nix
+    ./ui.nix
+  ];
 
   # home.sessionVariables.EDITOR = "nvim";
 

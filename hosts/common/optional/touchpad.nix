@@ -6,4 +6,3 @@
     touchpad.disableWhileTyping = true;
   };
 }
-

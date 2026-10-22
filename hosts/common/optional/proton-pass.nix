@@ -1,3 +1,5 @@
 { pkgs, ... }:
 
-{ environment.systemPackages = with pkgs; [ proton-pass ]; }
+{
+  environment.systemPackages = with pkgs; [ proton-pass ];
+}

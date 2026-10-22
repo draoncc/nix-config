@@ -39,19 +39,25 @@
               '';
               subvolumes = {
                 "/root" = {
-                  mountOptions = ["compress=zstd"];
+                  mountOptions = [ "compress=zstd" ];
                   mountpoint = "/";
                 };
                 "/nix" = {
-                  mountOptions = ["compress=zstd" "noatime"];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                   mountpoint = "/nix";
                 };
                 "/persist" = {
-                  mountOptions = ["compress=zstd"];
+                  mountOptions = [ "compress=zstd" ];
                   mountpoint = "/persist";
                 };
                 "/swap" = {
-                  mountOptions = ["compress=zstd" "noatime"];
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
                   mountpoint = "/swap";
                   swap.swapfile = {
                     size = "8196M";

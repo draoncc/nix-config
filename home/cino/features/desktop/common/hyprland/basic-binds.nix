@@ -1,7 +1,7 @@
 { lib, ... }:
 let
   workspaces = (map (n: "F${toString n}") (lib.range 1 12));
-    # ++ (map toString (lib.range 0 9));
+  # ++ (map toString (lib.range 0 9));
   mod = "ALT";
   keymaps = {
     e = "code:26";
@@ -27,12 +27,17 @@ let
     t = "u"; # up
     h = "d"; # down
   };
-in {
+in
+{
   wayland.windowManager.hyprland.configType = "hyprlang";
   wayland.windowManager.hyprland.settings = {
-    bindm = [ "${mod},mouse:272,movewindow" "${mod},mouse:273,resizewindow" ];
+    bindm = [
+      "${mod},mouse:272,movewindow"
+      "${mod},mouse:273,resizewindow"
+    ];
 
-    bind = with keymaps;
+    bind =
+      with keymaps;
       [
         "${mod}SHIFT,${q},killactive"
         "${mod}SHIFT,${e},exit"
@@ -55,30 +60,31 @@ in {
 
         "${mod},${u},togglespecialworkspace"
         "${mod}SHIFT,${u},movetoworkspace,special"
-      ] ++
-      # Change workspace
-      (map (n: "${mod},${n},workspace,name:${n}") workspaces) ++
-      # Move window to workspace
-      (map (n: "${mod}SHIFT,${n},movetoworkspacesilent,name:${n}") workspaces)
+      ]
       ++
-      # Move focus
-      (lib.mapAttrsToList
-        (key: direction: "${mod},${key},movefocus,${direction}") directions) ++
-      # Swap windows
-      (lib.mapAttrsToList
-        (key: direction: "${mod}SHIFT,${key},swapwindow,${direction}")
-        directions) ++
-      # Move windows
-      (lib.mapAttrsToList
-        (key: direction: "${mod}CONTROL,${key},movewindoworgroup,${direction}")
-        directions) ++
-      # Move monitor focus
-      (lib.mapAttrsToList
-        (key: direction: "${mod}ALT,${key},focusmonitor,${direction}")
-        directions) ++
-      # Move workspace to other monitor
-      (lib.mapAttrsToList (key: direction:
-        "${mod}ALTSHIFT,${key},movecurrentworkspacetomonitor,${direction}")
-        directions);
+        # Change workspace
+        (map (n: "${mod},${n},workspace,name:${n}") workspaces)
+      ++
+        # Move window to workspace
+        (map (n: "${mod}SHIFT,${n},movetoworkspacesilent,name:${n}") workspaces)
+      ++
+        # Move focus
+        (lib.mapAttrsToList (key: direction: "${mod},${key},movefocus,${direction}") directions)
+      ++
+        # Swap windows
+        (lib.mapAttrsToList (key: direction: "${mod}SHIFT,${key},swapwindow,${direction}") directions)
+      ++
+        # Move windows
+        (lib.mapAttrsToList (
+          key: direction: "${mod}CONTROL,${key},movewindoworgroup,${direction}"
+        ) directions)
+      ++
+        # Move monitor focus
+        (lib.mapAttrsToList (key: direction: "${mod}ALT,${key},focusmonitor,${direction}") directions)
+      ++
+        # Move workspace to other monitor
+        (lib.mapAttrsToList (
+          key: direction: "${mod}ALTSHIFT,${key},movecurrentworkspacetomonitor,${direction}"
+        ) directions);
   };
 }

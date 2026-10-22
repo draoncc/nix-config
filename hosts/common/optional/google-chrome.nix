@@ -1,3 +1,5 @@
 { pkgs, ... }:
 
-{ users.users.cino.packages = with pkgs; [ google-chrome ]; }
+{
+  users.users.cino.packages = with pkgs; [ google-chrome ];
+}

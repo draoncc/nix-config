@@ -1,4 +1,10 @@
-{ outputs, config, lib, pkgs, ... }:
+{
+  outputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   # Dependencies
@@ -22,23 +28,29 @@ let
   wofi = "${pkgs.wofi}/bin/wofi";
 
   # Function to simplify making waybar outputs
-  jsonOutput = name:
-    { pre ? "", text ? "", tooltip ? "", alt ? "", class ? "", percentage ? ""
+  jsonOutput =
+    name:
+    {
+      pre ? "",
+      text ? "",
+      tooltip ? "",
+      alt ? "",
+      class ? "",
+      percentage ? "",
     }:
-    "${
-      pkgs.writeShellScriptBin "waybar-${name}" ''
-        set -euo pipefail
-        ${pre}
-        ${jq} -cn \
-          --arg text "${text}" \
-          --arg tooltip "${tooltip}" \
-          --arg alt "${alt}" \
-          --arg class "${class}" \
-          --arg percentage "${percentage}" \
-          '{text:$text,tooltip:$tooltip,alt:$alt,class:$class,percentage:$percentage}'
-      ''
-    }/bin/waybar-${name}";
-in {
+    "${pkgs.writeShellScriptBin "waybar-${name}" ''
+      set -euo pipefail
+      ${pre}
+      ${jq} -cn \
+        --arg text "${text}" \
+        --arg tooltip "${tooltip}" \
+        --arg alt "${alt}" \
+        --arg class "${class}" \
+        --arg percentage "${percentage}" \
+        '{text:$text,tooltip:$tooltip,alt:$alt,class:$class,percentage:$percentage}'
+    ''}/bin/waybar-${name}";
+in
+{
   programs.waybar = {
     enable = true;
     package = pkgs.waybar.overrideAttrs (oa: {
@@ -99,7 +111,11 @@ in {
             headphone = "󰋋";
             headset = "󰋎";
             portable = "";
-            default = [ "" "" "" ];
+            default = [
+              ""
+              ""
+              ""
+            ];
           };
           on-click = pavucontrol;
         };
@@ -113,7 +129,18 @@ in {
         battery = {
           bat = "BAT0";
           interval = 10;
-          format-icons = [ "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹" ];
+          format-icons = [
+            "󰁺"
+            "󰁻"
+            "󰁼"
+            "󰁽"
+            "󰁾"
+            "󰁿"
+            "󰂀"
+            "󰂁"
+            "󰂂"
+            "󰁹"
+          ];
           format = "{icon}"; # "{icon} {capacity}%";
           format-charging = "󰂄 {capacity}%";
           onclick = "";
@@ -122,7 +149,9 @@ in {
             critical = 10;
           };
         };
-        "sway/window" = { max-length = 20; };
+        "sway/window" = {
+          max-length = 20;
+        };
         network = {
           interval = 3;
           format-wifi = "   {essid}";
@@ -164,12 +193,13 @@ in {
           return-type = "json";
           exec = jsonOutput "menu" {
             text = "";
-            tooltip = ''
-              $(${cat} /etc/os-release | ${grep} PRETTY_NAME | ${cut} -d '"' -f2)'';
+            tooltip = ''$(${cat} /etc/os-release | ${grep} PRETTY_NAME | ${cut} -d '"' -f2)'';
           };
           on-click = "${wofi} -S drun -x 10 -y 10 -W 25% -H 60%";
         };
-        "custom/hostname" = { exec = "echo $USER@$HOSTNAME"; };
+        "custom/hostname" = {
+          exec = "echo $USER@$HOSTNAME";
+        };
         # "custom/unread-mail" = {
         #   interval = 5;
         #   return-type = "json";
@@ -250,8 +280,7 @@ in {
             "active (Transition (Day)" = " ";
             "active (Transition (Daytime)" = " ";
           };
-          on-click =
-            "${systemctl} --user is-active gammastep && ${systemctl} --user stop gammastep || ${systemctl} --user start gammastep";
+          on-click = "${systemctl} --user is-active gammastep && ${systemctl} --user stop gammastep || ${systemctl} --user start gammastep";
         };
         "custom/currentplayer" = {
           interval = 2;
@@ -288,8 +317,7 @@ in {
         };
         "custom/player" = {
           exec-if = "${playerctl} status";
-          exec = ''
-            ${playerctl} metadata --format '{"text": "{{title}} - {{artist}}", "alt": "{{status}}", "tooltip": "{{title}} - {{artist}} ({{album}})"}' '';
+          exec = ''${playerctl} metadata --format '{"text": "{{title}} - {{artist}}", "alt": "{{status}}", "tooltip": "{{title}} - {{artist}} ({{album}})"}' '';
           return-type = "json";
           interval = 2;
           max-length = 30;
@@ -309,111 +337,113 @@ in {
     # x y -> vertical, horizontal
     # x y z -> top, horizontal, bottom
     # w x y z -> top, right, bottom, left
-    style = let
-      inherit (config.colorscheme) palette;
-      # css
-    in ''
-      * {
-        font-family: ${config.fontProfiles.regular.family}, ${config.fontProfiles.monospace.family};
-        font-size: 12pt;
-        min-width: 24px;
-        padding: 0 8px;
-        border-radius: 24px;
-      }
+    style =
+      let
+        inherit (config.colorscheme) palette;
+        # css
+      in
+      ''
+        * {
+          font-family: ${config.fontProfiles.regular.family}, ${config.fontProfiles.monospace.family};
+          font-size: 12pt;
+          min-width: 24px;
+          padding: 0 8px;
+          border-radius: 24px;
+        }
 
-      .modules-right {
-        margin-right: -15px;
-      }
+        .modules-right {
+          margin-right: -15px;
+        }
 
-      .modules-left {
-        margin-left: -15px;
-      }
+        .modules-left {
+          margin-left: -15px;
+        }
 
-      window#waybar.top {
-        opacity: 0.90;
-        padding: 0;
-      }
-      window#waybar.bottom {
-        opacity: 0.95;
-      }
+        window#waybar.top {
+          opacity: 0.90;
+          padding: 0;
+        }
+        window#waybar.bottom {
+          opacity: 0.95;
+        }
 
-      window#waybar {
-        color: #${palette.base05};
-        background-color: rgba(0, 0, 0, 0);
-        /* background-color: #${palette.base00}; */
-        /* border-width: 2px; */
-        border-style: solid;
-        border-color: #${palette.base0C};
-        /* border-radius: 10px; */
-      }
+        window#waybar {
+          color: #${palette.base05};
+          background-color: rgba(0, 0, 0, 0);
+          /* background-color: #${palette.base00}; */
+          /* border-width: 2px; */
+          border-style: solid;
+          border-color: #${palette.base0C};
+          /* border-radius: 10px; */
+        }
 
-      #workspaces button {
-        background-color: #${palette.base01};
-        color: #${palette.base05};
-        padding: 5px 1px;
-        margin: 3px 0;
-        border-radius: 10px;
-      }
-      #workspaces button.hidden {
-        background-color: #${palette.base00};
-        color: #${palette.base04};
-      }
-      #workspaces button.focused,
-      #workspaces button.active {
-        background-color: #${palette.base0A};
-        color: #${palette.base00};
-      }
+        #workspaces button {
+          background-color: #${palette.base01};
+          color: #${palette.base05};
+          padding: 5px 1px;
+          margin: 3px 0;
+          border-radius: 10px;
+        }
+        #workspaces button.hidden {
+          background-color: #${palette.base00};
+          color: #${palette.base04};
+        }
+        #workspaces button.focused,
+        #workspaces button.active {
+          background-color: #${palette.base0A};
+          color: #${palette.base00};
+        }
 
-      #clock {
-        background-color: #${palette.base00};
-        /* padding-left: 15px;
-        padding-right: 15px;
-        margin-top: 0;
-        margin-bottom: 0;
-        border-radius: 10px; */
-      }
+        #clock {
+          background-color: #${palette.base00};
+          /* padding-left: 15px;
+          padding-right: 15px;
+          margin-top: 0;
+          margin-bottom: 0;
+          border-radius: 10px; */
+        }
 
-      #custom-menu {
-        background-color: #${palette.base0C};
-        color: #${palette.base00};
-        padding-left: 15px;
-        padding-right: 22px;
-        margin: 0;
-        /* border-radius: 10px; */
-      }
-      #custom-hostname {
-        background-color: #${palette.base0C};
-        color: #${palette.base00};
-        padding-left: 15px;
-        padding-right: 18px;
-        margin-right: 0;
-        margin-top: 0;
-        margin-bottom: 0;
-        /* border-radius: 10px; */
-      }
-      #custom-currentplayer {
-        padding-right: 0;
-      }
+        #custom-menu {
+          background-color: #${palette.base0C};
+          color: #${palette.base00};
+          padding-left: 15px;
+          padding-right: 22px;
+          margin: 0;
+          /* border-radius: 10px; */
+        }
+        #custom-hostname {
+          background-color: #${palette.base0C};
+          color: #${palette.base00};
+          padding-left: 15px;
+          padding-right: 18px;
+          margin-right: 0;
+          margin-top: 0;
+          margin-bottom: 0;
+          /* border-radius: 10px; */
+        }
+        #custom-currentplayer {
+          padding-right: 0;
+        }
 
-      #battery {
-        background: #${palette.base00};
-        transition: color 0.5s ease-in;
-      }
-      #battery.warning {
-        color: #${palette.base0A};
-      }
-      #battery.critical {
-        animation: flashing 0.5s infinite ease-in-out;
-      }
-      @keyframes flashing {
-        0% { color: #${palette.base0F}; }
-        50% { color: #${palette.base05}; }
-        100% { color: #${palette.base0F}; }
-      }
+        #battery {
+          background: #${palette.base00};
+          transition: color 0.5s ease-in;
+        }
+        #battery.warning {
+          color: #${palette.base0A};
+        }
+        #battery.critical {
+          animation: flashing 0.5s infinite ease-in-out;
+        }
+        @keyframes flashing {
+          0% { color: #${palette.base0F}; }
+          50% { color: #${palette.base05}; }
+          100% { color: #${palette.base0F}; }
+        }
 
-      #tray {
-        color: #${palette.base05};
-      }
-    '';
+        #tray {
+          color: #${palette.base05};
+        }
+      '';
   };
 }

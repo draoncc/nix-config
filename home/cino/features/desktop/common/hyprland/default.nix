@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 
 let
   mod = "ALT";
@@ -28,7 +33,8 @@ let
     input-volume = "swayosd-client --input-volume +0";
   };
   grimblast = lib.getExe pkgs.grimblast;
-in {
+in
+{
   imports = [
     ../wayland-wm
 
@@ -49,9 +55,16 @@ in {
   # home.pointerCursor.hyprcursor.enable = true;
 
   xdg.portal = {
-    extraPortals = [(pkgs.xdg-desktop-portal-hyprland.override {hyprland = config.wayland.windowManager.hyprland.package;})];
+    extraPortals = [
+      (pkgs.xdg-desktop-portal-hyprland.override {
+        hyprland = config.wayland.windowManager.hyprland.package;
+      })
+    ];
     config.hyprland = {
-      default = ["hyprland" "gtk"];
+      default = [
+        "hyprland"
+        "gtk"
+      ];
     };
   };
 
@@ -78,8 +91,7 @@ in {
       input = {
         kb_layout = "us";
         kb_variant = "dvp";
-        kb_options =
-          "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
+        kb_options = "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
         touchpad.disable_while_typing = false;
       };
 
@@ -129,96 +141,110 @@ in {
 
       exec = [ "${pkgs.swaybg}/bin/swaybg -i ${config.wallpaper} --mode fill" ];
 
-      bind = let
-        swaylock = "${config.programs.swaylock.package}/bin/swaylock";
-        playerctl = "${config.services.playerctld.package}/bin/playerctl";
-        playerctld = "${config.services.playerctld.package}/bin/playerctld";
-        makoctl = "${config.services.mako.package}/bin/makoctl";
-        wofi = "${config.programs.wofi.package}/bin/wofi";
-        pass-wofi = "${
+      bind =
+        let
+          swaylock = "${config.programs.swaylock.package}/bin/swaylock";
+          playerctl = "${config.services.playerctld.package}/bin/playerctl";
+          playerctld = "${config.services.playerctld.package}/bin/playerctld";
+          makoctl = "${config.services.mako.package}/bin/makoctl";
+          wofi = "${config.programs.wofi.package}/bin/wofi";
+          pass-wofi = "${
             pkgs.pass-wofi.override {
               pass = config.programs.password-store.package;
             }
           }/bin/pass-wofi";
 
-        pactl = "${pkgs.pulseaudio}/bin/pactl";
+          pactl = "${pkgs.pulseaudio}/bin/pactl";
 
-        gtk-launch = "${pkgs.gtk3}/bin/gtk-launch";
-        xdg-mime = "${pkgs.xdg-utils}/bin/xdg-mime";
-        defaultApp = type: "${gtk-launch} $(${xdg-mime} query default ${type})";
+          gtk-launch = "${pkgs.gtk3}/bin/gtk-launch";
+          xdg-mime = "${pkgs.xdg-utils}/bin/xdg-mime";
+          defaultApp = type: "${gtk-launch} $(${xdg-mime} query default ${type})";
 
-        terminal = config.home.sessionVariables.TERMINAL;
-        browser = defaultApp "x-scheme-handler/https";
-        editor = defaultApp "text/plain";
-      in with keymaps;
-      [
-        # Program bindings
-        "${mod},Return,exec,${terminal}"
-        "${mod},${e},exec,${editor}"
-        "${mod},${v},exec,${editor}"
-        "${mod},${b},exec,${browser}"
+          terminal = config.home.sessionVariables.TERMINAL;
+          browser = defaultApp "x-scheme-handler/https";
+          editor = defaultApp "text/plain";
+        in
+        with keymaps;
+        [
+          # Program bindings
+          "${mod},Return,exec,${terminal}"
+          "${mod},${e},exec,${editor}"
+          "${mod},${v},exec,${editor}"
+          "${mod},${b},exec,${browser}"
 
-        # Brightness control (only works if the system has brightnessctl)
-        ",XF86MonBrightnessUp,exec,brightnessctl s +10%; ${swayosd.brightness}"
-        ",XF86MonBrightnessDown,exec,brightnessctl s -10%; ${swayosd.brightness}"
+          # Brightness control (only works if the system has brightnessctl)
+          ",XF86MonBrightnessUp,exec,brightnessctl s +10%; ${swayosd.brightness}"
+          ",XF86MonBrightnessDown,exec,brightnessctl s -10%; ${swayosd.brightness}"
 
-        # Volume
-        ",XF86AudioRaiseVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ +5%; ${swayosd.output-volume}"
-        ",XF86AudioLowerVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ -5%; ${swayosd.output-volume}"
-        ",XF86AudioMute,exec,${pactl} set-sink-mute @DEFAULT_SINK@ toggle; ${swayosd.output-volume}"
-        "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
-        ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
+          # Volume
+          ",XF86AudioRaiseVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ +5%; ${swayosd.output-volume}"
+          ",XF86AudioLowerVolume,exec,${pactl} set-sink-volume @DEFAULT_SINK@ -5%; ${swayosd.output-volume}"
+          ",XF86AudioMute,exec,${pactl} set-sink-mute @DEFAULT_SINK@ toggle; ${swayosd.output-volume}"
+          "SHIFT,XF86AudioMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
+          ",XF86AudioMicMute,exec,${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
 
-        # Screenshotting
-        ",Print,exec,${grimblast} --notify --freeze copy output"
-        "SHIFT,Print,exec,${grimblast} --notify --freeze copy active"
-        "CONTROL,Print,exec,${grimblast} --notify --freeze copy screen"
-        "${mod},Print,exec,${grimblast} --notify --freeze copy area"
-        "ALT,Print,exec,${grimblast} --notify --freeze copy area"
-      ] ++
+          # Screenshotting
+          ",Print,exec,${grimblast} --notify --freeze copy output"
+          "SHIFT,Print,exec,${grimblast} --notify --freeze copy active"
+          "CONTROL,Print,exec,${grimblast} --notify --freeze copy screen"
+          "${mod},Print,exec,${grimblast} --notify --freeze copy area"
+          "ALT,Print,exec,${grimblast} --notify --freeze copy area"
+        ]
+        ++
 
-      (lib.optionals config.services.playerctld.enable [
-        # Media control
-        ",XF86AudioNext,exec,${playerctl} next"
-        ",XF86AudioPrev,exec,${playerctl} previous"
-        ",XF86AudioPlay,exec,${playerctl} play-pause"
-        ",XF86AudioStop,exec,${playerctl} stop"
-        "ALT,XF86AudioNext,exec,${playerctld} shift"
-        "ALT,XF86AudioPrev,exec,${playerctld} unshift"
-        "ALT,XF86AudioPlay,exec,systemctl --user restart playerctld"
-      ]) ++
+          (lib.optionals config.services.playerctld.enable [
+            # Media control
+            ",XF86AudioNext,exec,${playerctl} next"
+            ",XF86AudioPrev,exec,${playerctl} previous"
+            ",XF86AudioPlay,exec,${playerctl} play-pause"
+            ",XF86AudioStop,exec,${playerctl} stop"
+            "ALT,XF86AudioNext,exec,${playerctld} shift"
+            "ALT,XF86AudioPrev,exec,${playerctld} unshift"
+            "ALT,XF86AudioPlay,exec,systemctl --user restart playerctld"
+          ])
+        ++
 
-      # Screen lock
-      (lib.optionals config.programs.swaylock.enable [
-        ",XF86Launch5,exec,${swaylock} -i ${config.wallpaper}"
-        ",XF86Launch4,exec,${swaylock} -i ${config.wallpaper}"
-        "${mod},backspace,exec,${swaylock} -i ${config.wallpaper}"
-      ]) ++
+          # Screen lock
+          (lib.optionals config.programs.swaylock.enable [
+            ",XF86Launch5,exec,${swaylock} -i ${config.wallpaper}"
+            ",XF86Launch4,exec,${swaylock} -i ${config.wallpaper}"
+            "${mod},backspace,exec,${swaylock} -i ${config.wallpaper}"
+          ])
+        ++
 
-      # Notification manager
-      (lib.optionals config.services.mako.enable
-        [ "${mod},${keymaps.w},exec,${makoctl} dismiss" ]) ++
+          # Notification manager
+          (lib.optionals config.services.mako.enable [ "${mod},${keymaps.w},exec,${makoctl} dismiss" ])
+        ++
 
-      # Launcher
-      (lib.optionals config.programs.wofi.enable [
-        "${mod},${keymaps.x},exec,${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
-        "${mod},${keymaps.d},exec,${wofi} -S run"
-      ] ++ (lib.optionals config.programs.password-store.enable [
-        ",Scroll_Lock,exec,${pass-wofi}" # fn+k
-        ",XF86Calculator,exec,${pass-wofi}" # fn+f12
-        "${mod},${keymaps.semicolon},exec,pass-wofi"
-      ]));
+          # Launcher
+          (
+            lib.optionals config.programs.wofi.enable [
+              "${mod},${keymaps.x},exec,${wofi} -S drun -x 10 -y 10 -W 25% -H 60%"
+              "${mod},${keymaps.d},exec,${wofi} -S run"
+            ]
+            ++ (lib.optionals config.programs.password-store.enable [
+              ",Scroll_Lock,exec,${pass-wofi}" # fn+k
+              ",XF86Calculator,exec,${pass-wofi}" # fn+f12
+              "${mod},${keymaps.semicolon},exec,pass-wofi"
+            ])
+          );
 
-      monitor = map (m: "${m.name},${
-        if m.enabled
-        then "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},${toString m.scale}"
-        else "disable"
-      }") (config.monitors)
-      # Fallback for monitors not declared above (e.g. a newly plugged-in display)
-      ++ [ ",preferred,auto,1" ];
+      monitor =
+        map (
+          m:
+          "${m.name},${
+            if m.enabled then
+              "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},${toString m.scale}"
+            else
+              "disable"
+          }"
+        ) (config.monitors)
+        # Fallback for monitors not declared above (e.g. a newly plugged-in display)
+        ++ [ ",preferred,auto,1" ];
 
-      workspace = map (m: "${m.name},${m.workspace}")
-        (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
+      workspace = map (m: "${m.name},${m.workspace}") (
+        lib.filter (m: m.enabled && m.workspace != null) config.monitors
+      );
     };
 
     # This is order sensitive, so it has to come here.

@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   # Make users congruent to NixOS configuration.
@@ -16,15 +21,17 @@
       "video"
       "wheel"
     ];
-    hashedPassword =
-      "$y$j9T$vDFlouCPsaL2VS1fO2iWT/$mf7JwgiP0d9mPWzfo.QyQ51QK9uCio4kOOG7tyil2n6";
+    hashedPassword = "$y$j9T$vDFlouCPsaL2VS1fO2iWT/$mf7JwgiP0d9mPWzfo.QyQ51QK9uCio4kOOG7tyil2n6";
 
-    openssh.authorizedKeys.keys = lib.splitString "\n" (builtins.readFile ../../../../home/cino/ssh.pub);
+    openssh.authorizedKeys.keys = lib.splitString "\n" (
+      builtins.readFile ../../../../home/cino/ssh.pub
+    );
   };
 
-  home-manager.users.cino =
-    import ../../../../home/cino/${config.networking.hostName}.nix;
+  home-manager.users.cino = import ../../../../home/cino/${config.networking.hostName}.nix;
 
   services.geoclue2.enable = true;
-  security.pam.services = { swaylock = { }; };
+  security.pam.services = {
+    swaylock = { };
+  };
 }

@@ -1,6 +1,8 @@
-{pkgs, config, ...}: let
+{ pkgs, config, ... }:
+let
   inherit (config.colorscheme) palette;
-in {
+in
+{
   services.swayosd = {
     enable = true;
     stylePath = pkgs.writeText "style.css" ''
