@@ -6,6 +6,8 @@
     ./features/cli/common
     ./features/cli/optional/godot.nix
     ./features/cli/optional/gmailctl.nix
+    ./features/cli/optional/android-tools.nix
+    ./features/cli/optional/proton-pass-cli.nix
     ./features/desktop/common
     ./features/desktop/optional/telegram.nix
   ];

@@ -20,10 +20,7 @@
     ../common/optional/backlight.nix
     ../common/optional/battery.nix
     ../common/optional/bluetooth.nix
-    ../common/optional/google-chrome.nix
     ../common/optional/docker.nix
-    ../common/optional/proton-pass.nix
-    ../common/optional/android-tools.nix
 
     ../common/users/cino
   ];

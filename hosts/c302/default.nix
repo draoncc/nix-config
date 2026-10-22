@@ -16,6 +16,7 @@
     inputs.disko.nixosModules.disko
     ../common/disko-config.nix
 
+    ../common/optional/ephemeral-btrfs.nix
     ../common/optional/networkmanager.nix
     ../common/optional/sound.nix
     ../common/optional/greetd.nix
@@ -24,8 +25,6 @@
     ../common/optional/backlight.nix
     ../common/optional/battery.nix
     ../common/optional/bluetooth.nix
-    ../common/optional/google-chrome.nix
-    ../common/optional/android-tools.nix
 
     ../common/users/cino
   ];
@@ -33,9 +32,6 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
-  # Required by impermanence; ephemeral-btrfs.nix sets this on wiped hosts
-  fileSystems."/persist".neededForBoot = true;
 
   programs = {
     dconf.enable = true;
