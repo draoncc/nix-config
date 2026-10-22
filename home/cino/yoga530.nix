@@ -9,6 +9,7 @@
     ./features/cli/optional/android-tools.nix
     ./features/cli/optional/proton-pass-cli.nix
     ./features/cli/optional/claude.nix
+    ./features/lang
     ./features/desktop/common
     ./features/desktop/optional/telegram.nix
   ];
