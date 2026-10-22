@@ -33,6 +33,9 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # Required by impermanence; ephemeral-btrfs.nix sets this on wiped hosts
+  fileSystems."/persist".neededForBoot = true;
+
   programs = {
     dconf.enable = true;
     kdeconnect.enable = true;
