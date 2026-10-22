@@ -1,20 +1,39 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   inherit (import ./lua.nix { inherit lib; }) hyprctlDispatch;
   dpmsOn = hyprctlDispatch ''hl.dsp.dpms({ action = "on" })'';
   dpmsOff = hyprctlDispatch ''hl.dsp.dpms({ action = "off" })'';
+
+  # Only count hyprlocks on our own display: with several Hyprland sessions
+  # (one per tty) a locked session must not keep the others from locking.
+  isLocked = toString (
+    pkgs.writeShellScript "hyprlock-running" ''
+      for pid in $(pgrep -xu "$UID" hyprlock); do
+        grep -qzx "WAYLAND_DISPLAY=$WAYLAND_DISPLAY" /proc/$pid/environ 2>/dev/null && exit 0
+      done
+      exit 1
+    ''
+  );
 in
 {
   services.hypridle = {
     enable = true;
     settings =
       let
-        isLocked = "pgrep hyprlock";
         isDischarging = "grep Discharging /sys/class/power_supply/BAT{0,1}/status -q";
       in
       {
         general = {
-          lock_cmd = "if ! ${isLocked}; then ${lib.getExe config.programs.hyprlock.package} --grace 5; fi";
+          # Run hyprlock in its own scope, outside hypridle.service's cgroup.
+          # Logging in on another tty restarts hyprland-session.target, which
+          # stops hypridle; a hyprlock in its cgroup would be killed with it,
+          # leaving that session locked with no lock client to accept input.
+          lock_cmd = "if ! ${isLocked}; then systemd-run --user --scope --collect --quiet ${lib.getExe config.programs.hyprlock.package} --grace 5; fi";
           before_sleep_cmd = "loginctl lock-session";
           after_sleep_cmd = dpmsOn;
           inhibit_sleep = 3; # Wait for lock before suspend
