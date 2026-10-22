@@ -14,7 +14,7 @@
     ../common/optional/ephemeral-btrfs.nix
     ../common/optional/networkmanager.nix
     ../common/optional/sound.nix
-    ../common/optional/regreet.nix
+    # ../common/optional/regreet.nix
     ../common/optional/desktop.nix
     ../common/optional/touchpad.nix
     ../common/optional/backlight.nix
