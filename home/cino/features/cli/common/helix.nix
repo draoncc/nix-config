@@ -14,6 +14,7 @@ in
       theme = "${builtins.replaceStrings [ "-" ] [ "_" ] colorscheme.slug}";
 
       editor = {
+        auto-format = true;
         color-modes = true;
         bufferline = "multiple";
         line-number = "relative";
