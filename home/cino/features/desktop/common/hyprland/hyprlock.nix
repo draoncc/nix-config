@@ -62,7 +62,7 @@ in
             color = "rgb(${lib.removePrefix "#" config.colorscheme.palette.base01})";
             font_family = config.fontProfiles.regular.family;
             font_size = toString (builtins.floor (140 * monitor.scale));
-            position = "0 0";
+            position = "0, 0";
           }
           {
             monitor = monitor.name;
