@@ -17,13 +17,21 @@ rec {
     };
     theme = {
       name = "${config.colorscheme.slug}";
-      package = pkgs.materia-theme; # gtkThemeFromScheme { scheme = config.colorscheme; };
+      package = pkgs.materia-theme;
     };
     iconTheme = {
       name = "Papirus";
       package = pkgs.papirus-icon-theme;
     };
     gtk4.theme = config.gtk.theme;
+  };
+
+  home.pointerCursor = {
+    enable = true;
+    gtk.enable = true;
+    package = pkgs.apple-cursor;
+    name = "macOS";
+    size = 24;
   };
 
   services.xsettingsd = {

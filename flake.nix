@@ -84,7 +84,7 @@
     in
     {
       inherit lib;
-      homeManagerModules = import ./modules/home-manager;
+      homeModules = import ./modules/home-manager;
 
       overlays = import ./overlays { inherit inputs outputs; };
 

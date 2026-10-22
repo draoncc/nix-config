@@ -6,6 +6,7 @@
     ./optin-persistence.nix
     ./zsh.nix
     ./podman.nix
+    ./display-manager.nix
   ];
 
   programs.fuse.userAllowOther = true;

@@ -11,7 +11,7 @@
     inputs.nix-colors.homeManagerModule
     ./nix.nix
   ]
-  ++ (builtins.attrValues outputs.homeManagerModules);
+  ++ (builtins.attrValues outputs.homeModules);
 
   nixpkgs = {
     overlays = builtins.attrValues outputs.overlays;
