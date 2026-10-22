@@ -1,3 +1,5 @@
+**Hosts**: each host is a `flake.nix` entry + `hosts/<name>/` + `home/cino/<name>.nix`, paired by `networking.hostName` (see `hosts/common/users/cino/default.nix`).
+
 ## Agent skills
 
 ### Issue tracker
