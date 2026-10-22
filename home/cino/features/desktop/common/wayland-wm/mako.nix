@@ -7,7 +7,7 @@ in
   services.mako = {
     enable = true;
     settings = {
-      iconPath =
+      icon-path =
         if variant == "dark" then
           "${config.gtk.iconTheme.package}/share/icons/Papirus-Dark"
         else
@@ -17,11 +17,11 @@ in
       anchor = "top-center";
       width = 400;
       height = 150;
-      borderSize = 2;
-      defaultTimeout = 12000;
-      backgroundColor = "#${palette.base00}dd";
-      borderColor = "#${palette.base03}dd";
-      textColor = "#${palette.base05}dd";
+      border-size = 2;
+      default-timeout = 12000;
+      background-color = "#${palette.base00}dd";
+      border-color = "#${palette.base03}dd";
+      text-color = "#${palette.base05}dd";
       layer = "overlay";
     };
   };
