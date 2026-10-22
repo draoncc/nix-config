@@ -1,4 +1,10 @@
-{config, lib, ...}: {
+{config, lib, ...}: let
+  # With no declared monitors, draw once across all of them (monitor = "")
+  monitors =
+    if config.monitors != [ ]
+    then config.monitors
+    else [{ name = ""; scale = 1.0; }];
+in {
   programs.hyprlock = {
     enable = true;
     settings = {
@@ -22,7 +28,7 @@
         blur_passes = 4;
         brightness = 0.8;
       };
-      input-field = lib.forEach config.monitors (monitor: {
+      input-field = lib.forEach monitors (monitor: {
         monitor = monitor.name;
         size = "800, 90";
         dots_size = toString (0.25 * monitor.scale);
@@ -38,7 +44,7 @@
         check_color = "rgba(00000000)";
         fail_color = "rgba(00000000)";
       });
-      label = lib.flatten (lib.forEach config.monitors (monitor: [
+      label = lib.flatten (lib.forEach monitors (monitor: [
         {
           monitor = monitor.name;
           text = "$TIME";

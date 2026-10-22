@@ -28,13 +28,14 @@ in
           type = types.int;
           default = 60;
         };
-        x = mkOption {
-          type = types.int;
-          default = 0;
+        position = mkOption {
+          type = types.str;
+          default = "auto";
+          example = "1920x0";
         };
-        y = mkOption {
-          type = types.int;
-          default = 0;
+        scale = mkOption {
+          type = types.float;
+          default = 1.0;
         };
         enabled = mkOption {
           type = types.bool;

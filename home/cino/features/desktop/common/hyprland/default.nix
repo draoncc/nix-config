@@ -213,7 +213,9 @@ in {
         if m.enabled
         then "${toString m.width}x${toString m.height}@${toString m.refreshRate},${m.position},${toString m.scale}"
         else "disable"
-      }") (config.monitors);
+      }") (config.monitors)
+      # Fallback for monitors not declared above (e.g. a newly plugged-in display)
+      ++ [ ",preferred,auto,1" ];
 
       workspace = map (m: "${m.name},${m.workspace}")
         (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
