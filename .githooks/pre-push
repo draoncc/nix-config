@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Evaluate every config and build checks/ (`just check`) on each commit
+# being pushed. Skip once with `git push --no-verify`.
+set -eu
+top=$(git rev-parse --show-toplevel)
+while read -r _ sha _ _; do
+  [[ $sha =~ ^0+$ ]] && continue # a deleted ref
+  just --justfile "$top/justfile" check "git+file://$top?rev=$sha" </dev/null
+done

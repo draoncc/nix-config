@@ -1,7 +1,27 @@
 #!/usr/bin/env bash
-# Run `just eval` when a commit touches the config. Enabled per clone with
+# Fast checks on the staged .nix files: each one parses and is formatted.
+# Evaluation runs in the background after the commit (post-commit) and
+# checks/ builds before a push (pre-push). Enabled per clone with
 # `just install-hooks`; skip once with `git commit --no-verify`.
-# nix flake check reads the working tree, so unstaged edits are checked too.
 set -eu
-git diff --cached --name-only | grep -qE '\.nix$|^flake\.lock$|^checks/' || exit 0
-exec just eval
+git_dir=$(git rev-parse --git-dir)
+if [ -f "$git_dir/eval-failed" ]; then
+  echo "warning: eval of $(cat "$git_dir/eval-failed") failed; see $git_dir/eval.log" >&2
+fi
+
+mapfile -d '' files < <(git diff --cached --name-only -z --diff-filter=ACMR -- '*.nix')
+[ ${#files[@]} -gt 0 ] || exit 0
+
+# The nixfmt that `nix fmt` (nixfmt-tree) wraps, from the pinned nixpkgs.
+nixfmt=$(nix build --no-link --print-out-paths --inputs-from . nixpkgs#nixfmt)/bin/nixfmt
+fail=0
+for f in "${files[@]}"; do
+  if ! err=$(git show ":$f" | nix-instantiate --parse - 2>&1 >/dev/null); then
+    sed "s|«stdin»|$f|" <<<"$err" >&2
+    fail=1
+  elif ! git show ":$f" | "$nixfmt" --check - 2>/dev/null; then
+    echo "$f: not formatted; run \`just fmt $f\`" >&2
+    fail=1
+  fi
+done
+exit $fail

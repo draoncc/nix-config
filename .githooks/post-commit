@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Evaluate the new commit (`just eval` on that revision) in the background,
+# so committing doesn't wait on it. A failure sends a notification where
+# notify-send works, and the next commit warns about it.
+set -eu
+git_dir=$(git rev-parse --absolute-git-dir)
+# A rebase commits once per pick; the pre-push check covers the result.
+[ -d "$git_dir/rebase-merge" ] || [ -d "$git_dir/rebase-apply" ] && exit 0
+git diff-tree --root --no-commit-id --name-only -r HEAD | grep -qE '\.nix$|^flake\.lock$|^checks/' || exit 0
+
+top=$(git rev-parse --show-toplevel)
+rev=$(git rev-parse --short HEAD)
+# flock runs one eval at a time, so the newest commit's result is the one left.
+(
+  if flock "$git_dir/eval.lock" just --justfile "$top/justfile" eval "git+file://$top?rev=$(git rev-parse HEAD)" >"$git_dir/eval.log" 2>&1; then
+    rm -f "$git_dir/eval-failed"
+  else
+    echo "$rev" >"$git_dir/eval-failed"
+    notify-send "nix-config: eval of $rev failed" "$git_dir/eval.log" 2>/dev/null || true
+  fi
+) </dev/null >/dev/null 2>&1 &

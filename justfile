@@ -10,17 +10,19 @@ format FILE:
 format-all:
     nix fmt
 
-# Evaluate every config and build checks/ (the Hyprland config verifier)
-check:
-    nix flake check
+# Evaluate every config and build checks/ (the Hyprland config verifier).
+# FLAKE can pin a commit: "git+file://$PWD?rev=SHA".
+check FLAKE=".":
+    nix flake check {{quote(FLAKE)}}
 
-# Run `just check` before each commit that touches the config
+# Commit: parse and format-check staged .nix files, then `just eval` the
+# commit in the background. Push: `just check` each pushed commit.
 install-hooks:
     git config core.hooksPath .githooks
 
-# Evaluate only: fast, but skips checks/
-eval:
-    nix flake check --no-build
+# Evaluate only: skips building checks/
+eval FLAKE=".":
+    nix flake check --no-build {{quote(FLAKE)}}
 
 # Config errors daemons logged to the user journal this boot (or since SINCE,
 # e.g. "10 min ago" after a switch). Catches what checks/ can't: configs
