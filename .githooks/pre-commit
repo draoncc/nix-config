@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Fast checks on the staged .nix files: each one parses and is formatted.
 # Evaluation runs in the background after the commit (post-commit) and
-# checks/ builds before a push (pre-push). Enabled per clone with
+# checks/ builds before a push (pre-push); docs/adr/0003 says why this
+# hook stays under 5s. Enabled per clone with
 # `just install-hooks`; skip once with `git commit --no-verify`.
 set -eu
 git_dir=$(git rev-parse --git-dir)
