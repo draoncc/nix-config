@@ -75,6 +75,44 @@ let
       touch $out
     '';
 
+  # A package whose build differs from pkgs.<name> (programs.wofi.package
+  # with a patch, hyprland from its input, ...) must be used everywhere: a
+  # `''${pkgs.wofi}` beside it runs the stock build. Looks for the stock
+  # store path of each such home.packages entry in the generated files.
+  stockPackageCheck =
+    name: hostPkgs: hm:
+    let
+      try =
+        x:
+        let
+          r = builtins.tryEval x;
+        in
+        r.success && r.value;
+      replaced = lib.unique (
+        lib.concatMap (
+          p:
+          let
+            n = p.pname or null;
+          in
+          lib.optional (
+            n != null
+            && try (hostPkgs ? ${n} && lib.isDerivation hostPkgs.${n} && hostPkgs.${n}.outPath != p.outPath)
+          ) n
+        ) hm.home.packages
+      );
+      # Only the path is needed, not the stock build itself.
+      stockPath = n: builtins.unsafeDiscardStringContext hostPkgs.${n}.outPath;
+    in
+    pkgs.runCommandLocal "stock-packages-${name}" { nativeBuildInputs = [ pkgs.gnugrep ]; } ''
+      ${lib.concatMapStrings (n: ''
+        if grep -RlF ${stockPath n} ${hm.home-files}/; then
+          echo "^ uses the stock ${n} (${stockPath n}); use the configured package, e.g. config.programs.${n}.package"
+          fail=1
+        fi
+      '') replaced}
+      [ -z "''${fail:-}" ] && touch $out
+    '';
+
   # Each named theme must exist in its package: a typo'd or missing name
   # falls back to the toolkit default without an error.
   themeCheck =
@@ -191,4 +229,13 @@ in
 }) homeUsers
 // lib.mapAttrs' (
   hostName: host: lib.nameValuePair "themes-${hostName}" (themeCheck hostName (hostThemes host))
+) hostsOnSystem
+// lib.concatMapAttrs (
+  hostName: host:
+  lib.mapAttrs' (
+    user: hm:
+    lib.nameValuePair "stock-packages-${hostName}-${user}" (
+      stockPackageCheck "${hostName}-${user}" host.pkgs hm
+    )
+  ) host.config.home-manager.users
 ) hostsOnSystem

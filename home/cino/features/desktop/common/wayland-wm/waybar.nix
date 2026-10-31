@@ -25,7 +25,7 @@ let
   playerctl = "${pkgs.playerctl}/bin/playerctl";
   playerctld = "${pkgs.playerctl}/bin/playerctld";
   pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
-  wofi = "${pkgs.wofi}/bin/wofi";
+  wofi = "${config.programs.wofi.package}/bin/wofi";
 
   # Function to simplify making waybar outputs
   jsonOutput =
