@@ -27,7 +27,9 @@
 # - A second hyprlock on an already-locked session doesn't exit; it hangs.
 # - A host config's hyprland.start hook restarts hyprland-session.target and
 #   its shutdown hook stops it, moving or killing the live session's waybar,
-#   hyprpaper, ... (docs/adr/0001). --host drops both hooks.
+#   hyprpaper, ... (docs/adr/0001). --host drops both events, which is where
+#   every session hook lives (home/cino/features/desktop/common/hyprland/
+#   session.nix); the session daemons such as hypridle go with them.
 # - On Wayland, GTK takes its theme and font from dconf, not settings.ini.
 #   home-manager only writes dconf at activation, so --host loads the
 #   generation's hm-dconf.ini, on the private bus: on the live bus,

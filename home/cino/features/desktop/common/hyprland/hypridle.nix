@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (import ./lua.nix { inherit lib; }) hyprctlDispatch toLua;
+  inherit (import ./lua.nix { inherit lib; }) hyprctlDispatch;
   dpmsOn = hyprctlDispatch ''hl.dsp.dpms({ action = "on" })'';
   dpmsOff = hyprctlDispatch ''hl.dsp.dpms({ action = "off" })'';
 
@@ -22,14 +22,8 @@ let
 in
 {
   # One hypridle per Hyprland session, started by the compositor rather than
-  # as a systemd user service. The user manager is shared by every tty, and
-  # each login restarts hyprland-session.target: a hypridle.service would be
-  # moved to the newest session, leaving older ones with no idle locking.
-  wayland.windowManager.hyprland.extraConfig = ''
-    hl.on("hyprland.start", function()
-      hl.exec_cmd(${toLua (lib.getExe pkgs.hypridle)})
-    end)
-  '';
+  # as a systemd user service (see session.nix).
+  hyprland.sessionDaemons = [ (lib.getExe pkgs.hypridle) ];
 
   services.hypridle = {
     enable = true;
