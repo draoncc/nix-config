@@ -27,7 +27,7 @@ orphans=$(find . -name '*.nix' -printf '%P\n' | sort | while read -r file; do
   [ -n "${seen[$file]:-}" ] || echo "$file"
 done)
 if [ -n "$orphans" ]; then
-  echo "Not imported (or parked in a commented-out import) from flake.nix or any host's home/cino/<host>.nix:"
+  echo "Not imported (or parked in a commented-out import) from flake.nix or any host's hosts/<host> or home/cino/<host>.nix:"
   echo "$orphans"
   exit 1
 fi

@@ -1,4 +1,4 @@
-**Hosts**: each host is a `flake.nix` entry + `hosts/<name>/` + `home/cino/<name>.nix`, paired by `networking.hostName` (see `hosts/common/users/cino/default.nix`).
+**Hosts**: each host is an entry in `flake.nix`'s `nixosConfigurations`; `mkHost` pairs `hosts/<name>/` with `home/cino/<name>.nix` and sets `networking.hostName`.
 
 **Checks**: `just check` after changing a config (builds `checks/`), plus `just hyprlock-check` for hyprlock; after a switch, `just config-errors SINCE` lists errors from configs only parsed at runtime. A commit only parses and format-checks; `just eval` then runs in the background, so after committing a config change run `flock .git/eval.lock true`: a `.git/eval-failed` file then means it failed, with the error in `.git/eval.log`. Hyprland config is Lua: start at the comment above `configType` in `home/cino/features/desktop/common/hyprland/default.nix`.
 

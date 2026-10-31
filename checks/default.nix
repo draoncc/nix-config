@@ -147,9 +147,13 @@ let
   src = ../.;
 
   # Every .nix file is imported, or parked behind a commented-out import.
+  # flake.nix's mkHost imports each host's two modules by name, which the
+  # script can't follow, so they are roots too.
   orphanCheck = pkgs.runCommandLocal "orphan-nix-files" { } ''
     ${pkgs.bash}/bin/bash ${./orphan-nix-files.sh} ${src} flake.nix ${
-      lib.concatMapStringsSep " " (host: "home/cino/${host}.nix") (lib.attrNames nixosConfigurations)
+      lib.concatMapStringsSep " " (host: "hosts/${host}/default.nix home/cino/${host}.nix") (
+        lib.attrNames nixosConfigurations
+      )
     }
     touch $out
   '';

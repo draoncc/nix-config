@@ -1,8 +1,6 @@
 { inputs, ... }:
 
 {
-  networking.hostName = "yoga530";
-
   imports = [
     inputs.nixos-facter-modules.nixosModules.facter
 

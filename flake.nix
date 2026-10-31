@@ -84,6 +84,23 @@
           config.allowUnfree = true;
         }
       );
+
+      mkHost =
+        name: host:
+        lib.nixosSystem (
+          lib.optionalAttrs (host ? system) { inherit (host) system; }
+          // {
+            modules = [
+              ./hosts/${name}
+              {
+                networking.hostName = name;
+                home-manager.users.cino = import ./home/cino/${name}.nix;
+              }
+            ]
+            ++ lib.optional (host ? disk) { _module.args.disk = host.disk; };
+            specialArgs = { inherit inputs outputs; };
+          }
+        );
     in
     {
       inherit lib;
@@ -102,31 +119,23 @@
         }
       );
 
-      nixosConfigurations = {
+      # A host NAME is hosts/NAME paired with home/cino/NAME.nix. Extra
+      # attrs: `system`, and `disk` for hosts partitioned by disko.
+      nixosConfigurations = lib.mapAttrs mkHost {
         # Asus Chromebook
-        c302 = lib.nixosSystem {
-          modules = [
-            ./hosts/c302
-            { _module.args.disk = "/dev/mmcblk0"; }
-          ];
-          specialArgs = { inherit inputs outputs; };
+        c302 = {
+          disk = "/dev/mmcblk0";
         };
 
         # WSL
-        wsl = lib.nixosSystem {
+        wsl = {
           system = "x86_64-linux";
-          modules = [ ./hosts/wsl ];
-          specialArgs = { inherit inputs outputs; };
         };
 
         # Lenovo Yoga
-        yoga530 = lib.nixosSystem {
+        yoga530 = {
           system = "x86_64-linux";
-          modules = [
-            ./hosts/yoga530
-            { _module.args.disk = "/dev/disk/by-id/nvme-SAMSUNG_MZVLW128HEGR-000L2_S35FNX0K439214"; }
-          ];
-          specialArgs = { inherit inputs outputs; };
+          disk = "/dev/disk/by-id/nvme-SAMSUNG_MZVLW128HEGR-000L2_S35FNX0K439214";
         };
       };
 
