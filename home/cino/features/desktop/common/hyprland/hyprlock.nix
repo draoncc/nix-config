@@ -1,6 +1,5 @@
 { config, lib, ... }:
 let
-  inherit (import ./lua.nix { inherit lib; }) keys bind exec;
   palette = config.lib.stylix.colors;
   inherit (config.stylix) fonts;
   textColor = "rgb(${palette.base01})";
@@ -80,16 +79,20 @@ in
     };
   };
 
-  wayland.windowManager.hyprland = {
-    settings = {
-      bind =
-        let
-          hyprlock = lib.getExe config.programs.hyprlock.package;
-        in
-        [
-          (bind (keys [ "SUPER" ] "backspace") (exec hyprlock))
-          (bind (keys [ "SUPER" ] "XF86Calculator") (exec hyprlock))
-        ];
-    };
-  };
+  hyprland.binds =
+    let
+      hyprlock = lib.getExe config.programs.hyprlock.package;
+    in
+    [
+      {
+        mods = [ "SUPER" ];
+        key = "backspace";
+        exec = hyprlock;
+      }
+      {
+        mods = [ "SUPER" ];
+        key = "XF86Calculator";
+        exec = hyprlock;
+      }
+    ];
 }

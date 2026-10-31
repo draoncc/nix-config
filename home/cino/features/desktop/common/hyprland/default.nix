@@ -6,34 +6,11 @@
 }:
 
 let
-  inherit (import ./lua.nix { inherit lib; })
-    keys
-    bind
-    exec
-    ;
+  inherit (import ./lua.nix { inherit lib; }) keys bind;
 
   palette = config.lib.stylix.colors;
 
-  mod = "ALT";
-  keymaps = {
-    e = "code:26";
-    q = "code:24";
-    s = "code:39";
-    f = "code:41";
-    minus = "code:20";
-    equal = "code:21";
-    g = "code:42";
-    t = "code:28";
-    apostrophe = "code:48";
-    u = "code:30";
-    v = "code:55";
-    b = "code:56";
-    w = "code:25";
-    x = "code:53";
-    d = "code:40";
-    semicolon = "code:47";
-    P = "code:33";
-  };
+  inherit (config.hyprland) mod qwerty;
 
   swayosd = {
     brightness = "swayosd-client --brightness +0";
@@ -69,6 +46,7 @@ in
   imports = [
     ../wayland-wm
 
+    ./binds.nix
     ./basic-binds.nix
     ./hyprbars.nix
     ./hyprlock.nix
@@ -99,6 +77,112 @@ in
     };
   };
 
+  hyprland.binds =
+    let
+      swaylock = "${config.programs.swaylock.package}/bin/swaylock";
+      playerctl = "${config.services.playerctld.package}/bin/playerctl";
+      playerctld = "${config.services.playerctld.package}/bin/playerctld";
+      makoctl = "${config.services.mako.package}/bin/makoctl";
+      wofi = "${config.programs.wofi.package}/bin/wofi";
+      pass-wofi = "${
+        pkgs.pass-wofi.override {
+          pass = config.programs.password-store.package;
+        }
+      }/bin/pass-wofi";
+
+      pactl = "${pkgs.pulseaudio}/bin/pactl";
+
+      gtk-launch = "${pkgs.gtk3}/bin/gtk-launch";
+      xdg-mime = "${pkgs.xdg-utils}/bin/xdg-mime";
+      defaultApp = type: "${gtk-launch} $(${xdg-mime} query default ${type})";
+
+      terminal = config.home.sessionVariables.TERMINAL;
+      browser = defaultApp "x-scheme-handler/https";
+      editor = defaultApp "text/plain";
+
+      execBind = mods: key: exec: { inherit mods key exec; };
+    in
+    with qwerty;
+    [
+      # Program bindings
+      (execBind [ mod ] "Return" terminal)
+      (execBind [ mod ] e editor)
+      (execBind [ mod ] v editor)
+      (execBind [ mod ] b browser)
+
+      # Brightness control (only works if the system has brightnessctl)
+      (execBind [ ] "XF86MonBrightnessUp" "brightnessctl s +10%; ${swayosd.brightness}")
+      (execBind [ ] "XF86MonBrightnessDown" "brightnessctl s -10%; ${swayosd.brightness}")
+
+      # Volume
+      (execBind [ ] "XF86AudioRaiseVolume"
+        "${pactl} set-sink-volume @DEFAULT_SINK@ +5%; ${swayosd.output-volume}"
+      )
+      (execBind [ ] "XF86AudioLowerVolume"
+        "${pactl} set-sink-volume @DEFAULT_SINK@ -5%; ${swayosd.output-volume}"
+      )
+      (execBind [ ] "XF86AudioMute"
+        "${pactl} set-sink-mute @DEFAULT_SINK@ toggle; ${swayosd.output-volume}"
+      )
+      (execBind [
+        "SHIFT"
+      ] "XF86AudioMute" "${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}")
+      (execBind [ ] "XF86AudioMicMute"
+        "${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
+      )
+
+      # Screenshotting
+      (execBind [ ] "Print" "${grimblast} --notify --freeze copy output")
+      (execBind [ "SHIFT" ] "Print" "${grimblast} --notify --freeze copy active")
+      (execBind [ "CONTROL" ] "Print" "${grimblast} --notify --freeze copy screen")
+      (execBind [ mod ] "Print" "${grimblast} --notify --freeze copy area")
+
+      # Passthrough mode (e.g. for VNC)
+      {
+        mods = [ mod ];
+        key = p;
+        dispatcher = ''hl.dsp.submap("passthrough")'';
+      }
+    ]
+    ++
+
+      (lib.optionals config.services.playerctld.enable [
+        # Media control
+        (execBind [ ] "XF86AudioNext" "${playerctl} next")
+        (execBind [ ] "XF86AudioPrev" "${playerctl} previous")
+        (execBind [ ] "XF86AudioPlay" "${playerctl} play-pause")
+        (execBind [ ] "XF86AudioStop" "${playerctl} stop")
+        (execBind [ "ALT" ] "XF86AudioNext" "${playerctld} shift")
+        (execBind [ "ALT" ] "XF86AudioPrev" "${playerctld} unshift")
+        (execBind [ "ALT" ] "XF86AudioPlay" "systemctl --user restart playerctld")
+      ])
+    ++
+
+      # Screen lock
+      (lib.optionals config.programs.swaylock.enable [
+        (execBind [ ] "XF86Launch5" "${swaylock} -i ${config.wallpaper}")
+        (execBind [ ] "XF86Launch4" "${swaylock} -i ${config.wallpaper}")
+        (execBind [ mod ] "backspace" "${swaylock} -i ${config.wallpaper}")
+      ])
+    ++
+
+      # Notification manager
+      (lib.optionals config.services.mako.enable [ (execBind [ mod ] qwerty.w "${makoctl} dismiss") ])
+    ++
+
+      # Launcher
+      (
+        lib.optionals config.programs.wofi.enable [
+          (execBind [ mod ] qwerty.x "${wofi} -S drun -x 10 -y 10 -W 25% -H 60%")
+          (execBind [ mod ] qwerty.d "${wofi} -S run")
+        ]
+        ++ (lib.optionals config.programs.password-store.enable [
+          (execBind [ ] "Scroll_Lock" pass-wofi) # fn+k
+          (execBind [ ] "XF86Calculator" pass-wofi) # fn+f12
+          (execBind [ mod ] qwerty.semicolon "pass-wofi")
+        ])
+      );
+
   wayland.windowManager.hyprland = {
     enable = true;
     package = pkgs.inputs.hyprland.hyprland;
@@ -111,6 +195,7 @@ in
     #   src/config/lua/bindings/LuaBindingsDispatchers.cpp in the input's source
     # Plugins load after the first config pass, so hl.plugin.<name> is nil
     # until then; guard plugin calls (see hyprbars.nix).
+    # Binds go in hyprland.binds (binds.nix), which rejects duplicate keys.
     # Verify changes with `just check` (see checks/default.nix).
     configType = "lua";
 
@@ -274,110 +359,6 @@ in
             }
           ];
 
-      bind =
-        let
-          swaylock = "${config.programs.swaylock.package}/bin/swaylock";
-          playerctl = "${config.services.playerctld.package}/bin/playerctl";
-          playerctld = "${config.services.playerctld.package}/bin/playerctld";
-          makoctl = "${config.services.mako.package}/bin/makoctl";
-          wofi = "${config.programs.wofi.package}/bin/wofi";
-          pass-wofi = "${
-            pkgs.pass-wofi.override {
-              pass = config.programs.password-store.package;
-            }
-          }/bin/pass-wofi";
-
-          pactl = "${pkgs.pulseaudio}/bin/pactl";
-
-          gtk-launch = "${pkgs.gtk3}/bin/gtk-launch";
-          xdg-mime = "${pkgs.xdg-utils}/bin/xdg-mime";
-          defaultApp = type: "${gtk-launch} $(${xdg-mime} query default ${type})";
-
-          terminal = config.home.sessionVariables.TERMINAL;
-          browser = defaultApp "x-scheme-handler/https";
-          editor = defaultApp "text/plain";
-
-          execBind =
-            mods: key: cmd:
-            bind (keys mods key) (exec cmd);
-        in
-        with keymaps;
-        [
-          # Program bindings
-          (execBind [ mod ] "Return" terminal)
-          (execBind [ mod ] e editor)
-          (execBind [ mod ] v editor)
-          (execBind [ mod ] b browser)
-
-          # Brightness control (only works if the system has brightnessctl)
-          (execBind [ ] "XF86MonBrightnessUp" "brightnessctl s +10%; ${swayosd.brightness}")
-          (execBind [ ] "XF86MonBrightnessDown" "brightnessctl s -10%; ${swayosd.brightness}")
-
-          # Volume
-          (execBind [ ] "XF86AudioRaiseVolume"
-            "${pactl} set-sink-volume @DEFAULT_SINK@ +5%; ${swayosd.output-volume}"
-          )
-          (execBind [ ] "XF86AudioLowerVolume"
-            "${pactl} set-sink-volume @DEFAULT_SINK@ -5%; ${swayosd.output-volume}"
-          )
-          (execBind [ ] "XF86AudioMute"
-            "${pactl} set-sink-mute @DEFAULT_SINK@ toggle; ${swayosd.output-volume}"
-          )
-          (execBind [
-            "SHIFT"
-          ] "XF86AudioMute" "${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}")
-          (execBind [ ] "XF86AudioMicMute"
-            "${pactl} set-source-mute @DEFAULT_SOURCE@ toggle; ${swayosd.input-volume}"
-          )
-
-          # Screenshotting
-          (execBind [ ] "Print" "${grimblast} --notify --freeze copy output")
-          (execBind [ "SHIFT" ] "Print" "${grimblast} --notify --freeze copy active")
-          (execBind [ "CONTROL" ] "Print" "${grimblast} --notify --freeze copy screen")
-          (execBind [ mod ] "Print" "${grimblast} --notify --freeze copy area")
-
-          # Passthrough mode (e.g. for VNC)
-          (bind (keys [ mod ] P) ''hl.dsp.submap("passthrough")'')
-        ]
-        ++
-
-          (lib.optionals config.services.playerctld.enable [
-            # Media control
-            (execBind [ ] "XF86AudioNext" "${playerctl} next")
-            (execBind [ ] "XF86AudioPrev" "${playerctl} previous")
-            (execBind [ ] "XF86AudioPlay" "${playerctl} play-pause")
-            (execBind [ ] "XF86AudioStop" "${playerctl} stop")
-            (execBind [ "ALT" ] "XF86AudioNext" "${playerctld} shift")
-            (execBind [ "ALT" ] "XF86AudioPrev" "${playerctld} unshift")
-            (execBind [ "ALT" ] "XF86AudioPlay" "systemctl --user restart playerctld")
-          ])
-        ++
-
-          # Screen lock
-          (lib.optionals config.programs.swaylock.enable [
-            (execBind [ ] "XF86Launch5" "${swaylock} -i ${config.wallpaper}")
-            (execBind [ ] "XF86Launch4" "${swaylock} -i ${config.wallpaper}")
-            (execBind [ mod ] "backspace" "${swaylock} -i ${config.wallpaper}")
-          ])
-        ++
-
-          # Notification manager
-          (lib.optionals config.services.mako.enable [ (execBind [ mod ] keymaps.w "${makoctl} dismiss") ])
-        ++
-
-          # Launcher
-          (
-            lib.optionals config.programs.wofi.enable [
-              (execBind [ mod ] keymaps.x "${wofi} -S drun -x 10 -y 10 -W 25% -H 60%")
-              (execBind [ mod ] keymaps.d "${wofi} -S run")
-            ]
-            ++ (lib.optionals config.programs.password-store.enable [
-              (execBind [ ] "Scroll_Lock" pass-wofi) # fn+k
-              (execBind [ ] "XF86Calculator" pass-wofi) # fn+f12
-              (execBind [ mod ] keymaps.semicolon "pass-wofi")
-            ])
-          );
-
       monitor =
         map (
           m:
@@ -411,6 +392,6 @@ in
       }) (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
     };
 
-    submaps.passthrough.settings.bind = [ (bind (keys [ mod ] keymaps.P) ''hl.dsp.submap("reset")'') ];
+    submaps.passthrough.settings.bind = [ (bind (keys [ mod ] qwerty.p) ''hl.dsp.submap("reset")'') ];
   };
 }

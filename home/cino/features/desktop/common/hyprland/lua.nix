@@ -11,7 +11,7 @@ rec {
 
   # Key string from modifiers and a key, e.g. keys [ "ALT" "SHIFT" ] "code:24"
   # -> "ALT + SHIFT + code:24". Lua binds reject repeated keys, so duplicate
-  # modifiers are collapsed (hyprlang silently did the same).
+  # modifiers are collapsed; hyprland.binds (binds.nix) rejects them instead.
   keys = mods: key: lib.concatStringsSep " + " (lib.unique mods ++ [ key ]);
 
   # A `bind` entry: `dispatcher` is a Lua expression, e.g. "hl.dsp.exit()".
