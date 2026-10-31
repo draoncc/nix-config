@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  osConfig,
   pkgs,
   ...
 }:
@@ -192,9 +193,10 @@ in
         };
 
         input = {
-          kb_layout = "us";
-          kb_variant = "dvp";
-          kb_options = "eurosign:e,compose:102,numpad:shift3,kpdl:semi,keypad:atm,caps:escape";
+          # The keymap is the system's (the tty and the greeter use it too)
+          kb_layout = osConfig.services.xserver.xkb.layout;
+          kb_variant = osConfig.services.xserver.xkb.variant;
+          kb_options = osConfig.services.xserver.xkb.options;
           touchpad.disable_while_typing = false;
         };
 

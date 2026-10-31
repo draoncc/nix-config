@@ -11,5 +11,5 @@
     };
   };
 
-  home.file.".background-image".source = ../../../../../../.background-image;
+  home.file.".background-image".source = config.wallpaper;
 }

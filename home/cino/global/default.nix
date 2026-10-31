@@ -19,6 +19,8 @@
     };
   };
 
+  wallpaper = ../../../.background-image;
+
   systemd.user.startServices = "sd-switch";
 
   programs.home-manager.enable = true;
