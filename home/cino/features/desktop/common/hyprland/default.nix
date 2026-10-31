@@ -7,7 +7,6 @@
 }:
 
 let
-  inherit (import ./lua.nix { inherit lib; }) keys bind;
 
   palette = config.lib.stylix.colors;
 
@@ -119,6 +118,12 @@ in
         mods = [ mod ];
         key = p;
         dispatcher = ''hl.dsp.submap("passthrough")'';
+      }
+      {
+        mods = [ mod ];
+        key = p;
+        dispatcher = ''hl.dsp.submap("reset")'';
+        submap = "passthrough";
       }
     ]
     ++
@@ -369,7 +374,5 @@ in
         default = true;
       }) (lib.filter (m: m.enabled && m.workspace != null) config.monitors);
     };
-
-    submaps.passthrough.settings.bind = [ (bind (keys [ mod ] qwerty.p) ''hl.dsp.submap("reset")'') ];
   };
 }

@@ -1,7 +1,7 @@
 # Hyprland's bind table. Features add entries to `hyprland.binds` (each
-# file may contribute); this module renders them as `hl.bind` calls and
-# fails evaluation when two entries resolve to the same key string, which
-# Hyprland itself accepts without a word.
+# file may contribute); this module renders them as `hl.bind` calls, in the
+# main map or a submap, and fails evaluation when two entries in one map
+# bind the same keys, which Hyprland itself accepts without a word.
 { config, lib, ... }:
 
 let
@@ -23,7 +23,15 @@ let
     else
       bindWith (keyString b) (dispatcher b) b.options;
 
-  collisions = lib.filterAttrs (_: bs: lib.length bs > 1) (lib.groupBy keyString cfg.binds);
+  # Modifier order doesn't matter to Hyprland, so it doesn't here either.
+  # A key given once as a keysym and once as a keycode still goes unnoticed.
+  chord =
+    b:
+    lib.optionalString (b.submap != null) "${b.submap}: "
+    + keys (lib.sort lib.lessThan (lib.unique b.mods)) b.key;
+  collisions = lib.filterAttrs (_: bs: lib.length bs > 1) (lib.groupBy chord cfg.binds);
+  inSubmap = name: lib.filter (b: b.submap == name) cfg.binds;
+  submaps = lib.unique (lib.filter (s: s != null) (map (b: b.submap) cfg.binds));
   repeatedMods = lib.filter (b: lib.unique b.mods != b.mods) cfg.binds;
   badActions = lib.filter (b: (b.dispatcher == null) == (b.exec == null)) cfg.binds;
 in
@@ -97,6 +105,12 @@ in
               };
               description = "Bind options, passed as hl.bind's third argument.";
             };
+            submap = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              example = "passthrough";
+              description = "Submap the bind belongs to; null for the main map.";
+            };
           };
         }
       );
@@ -104,7 +118,12 @@ in
   };
 
   config = {
-    wayland.windowManager.hyprland.settings.bind = map render cfg.binds;
+    wayland.windowManager.hyprland = {
+      settings.bind = map render (inSubmap null);
+      submaps = lib.genAttrs submaps (name: {
+        settings.bind = map render (inSubmap name);
+      });
+    };
 
     assertions = [
       {
