@@ -46,9 +46,9 @@ let
       # Red close button
       (button palette.base08 closeAction)
       # Yellow "minimize" (send to special workspace) button
-      (button palette.base08 minimizeAction)
+      (button palette.base0A minimizeAction)
       # Green "maximize" (fullscreen) button
-      (button palette.base05 maximizeAction)
+      (button palette.base0B maximizeAction)
     ];
 
   windowRules = [
