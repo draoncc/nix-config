@@ -2,6 +2,7 @@
 let
   palette = config.lib.stylix.colors;
   inherit (config.stylix) fonts;
+  inherit (config.hyprland) mod;
   textColor = "rgb(${palette.base01})";
 
   # With no declared monitors, draw once across all of them (monitor = "")
@@ -85,12 +86,12 @@ in
     in
     [
       {
-        mods = [ "SUPER" ];
+        mods = [ mod ];
         key = "backspace";
         exec = hyprlock;
       }
       {
-        mods = [ "SUPER" ];
+        mods = [ mod ];
         key = "XF86Calculator";
         exec = hyprlock;
       }
