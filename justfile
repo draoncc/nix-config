@@ -24,6 +24,25 @@ install-hooks:
 eval FLAKE=".":
     nix flake check --no-build {{quote(FLAKE)}}
 
+# Whether HOST's working-tree system differs from REV's, and if so a diff of
+# its generated hyprland.lua. A refactor should print "unchanged". Untracked
+# files are invisible to the flake: `git add -N` new ones first.
+diff HOST=hostname REV="HEAD":
+    #!/usr/bin/env bash
+    set -eu
+    old="git+file://$PWD?rev=$(git rev-parse {{quote(REV)}})#nixosConfigurations.{{HOST}}.config"
+    new=".#nixosConfigurations.{{HOST}}.config"
+    drv() { nix eval --raw "$1.system.build.toplevel.drvPath" 2>/dev/null; }
+    if [ "$(drv "$old")" = "$(drv "$new")" ]; then echo "{{HOST}}: unchanged"; exit 0; fi
+    echo "{{HOST}}: system changed"
+    hm=home-manager.users.cino
+    if [ "$(nix eval "$new.$hm.wayland.windowManager.hyprland.enable" 2>/dev/null)" = true ]; then
+      lua="$hm.xdg.configFile.\"hypr/hyprland.lua\".text"
+      diff <(nix eval --raw "$old.$lua" 2>/dev/null) <(nix eval --raw "$new.$lua" 2>/dev/null) \
+        && echo "hyprland.lua unchanged"
+    fi
+    exit 1
+
 # Config errors daemons logged to the user journal this boot (or since SINCE,
 # e.g. "10 min ago" after a switch). Catches what checks/ can't: configs
 # only parsed at runtime (mako, hyprlock, swayosd, hyprpaper, ...).
