@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Fast checks on the staged .nix files: each one parses and is formatted.
+# Fast pre-commit work: the staged .nix files must parse, then `just
+# fmt-all` formats the tree and the staged files are re-staged formatted.
 # Evaluation runs in the background after the commit (post-commit) and
 # checks/ builds before a push (pre-push); docs/adr/0003 says why this
 # hook stays under 5s. Enabled per clone with
@@ -13,16 +14,35 @@ fi
 mapfile -d '' files < <(git diff --cached --name-only -z --diff-filter=ACMR -- '*.nix')
 [ ${#files[@]} -gt 0 ] || exit 0
 
-# The nixfmt that `nix fmt` (nixfmt-tree) wraps, from the pinned nixpkgs.
-nixfmt=$(nix build --no-link --print-out-paths --inputs-from . nixpkgs#nixfmt)/bin/nixfmt
 fail=0
 for f in "${files[@]}"; do
   if ! err=$(git show ":$f" | nix-instantiate --parse - 2>&1 >/dev/null); then
     sed "s|«stdin»|$f|" <<<"$err" >&2
     fail=1
-  elif ! git show ":$f" | "$nixfmt" --check - 2>/dev/null; then
-    echo "$f: not formatted; run \`just fmt $f\`" >&2
-    fail=1
+  fi
+done
+[ $fail = 0 ] || exit 1
+
+# A file with unstaged changes can't be re-staged without committing them,
+# so formatting one of those stops the commit for a manual `git add`.
+mapfile -d '' partial < <(git diff --name-only -z -- "${files[@]}")
+declare -A before
+for f in "${partial[@]}"; do before[$f]=$(git hash-object "$f"); done
+
+if ! out=$(just fmt-all 2>&1); then
+  echo "warning: just fmt-all failed:" >&2
+  echo "$out" >&2
+fi
+
+for f in "${files[@]}"; do
+  if [ -n "${before[$f]+x}" ]; then
+    if [ "$(git hash-object "$f")" != "${before[$f]}" ]; then
+      echo "$f: formatted, but it also has unstaged changes; review and \`git add\` it" >&2
+      fail=1
+    fi
+  elif ! git diff --quiet -- "$f"; then
+    git add -- "$f"
+    echo "formatted $f"
   fi
 done
 exit $fail

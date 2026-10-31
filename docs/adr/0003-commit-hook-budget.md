@@ -2,7 +2,7 @@
 
 Committing waits on the pre-commit hook, so it gets a 5s budget. Evaluating the configs can't fit in that. On the WSL host, evaluating a bare NixOS system on our pinned nixpkgs takes 6.7s, and each of our hosts takes 14–25s (`just eval` covers all three in about 20s). So the checks are split by what each git step can afford:
 
-- **pre-commit** parses each staged `.nix` file and runs `nixfmt --check` on it (about 0.5s).
+- **pre-commit** parses each staged `.nix` file, then runs `just fmt-all` and re-stages the staged files it formatted (about 2.5s). A staged file that also has unstaged changes stops the commit instead, so formatting never stages work in progress.
 - **post-commit** runs `just eval` on the new commit in the background. A failure leaves `.git/eval-failed` and `.git/eval.log`, sends a `notify-send` where that works, and the next commit warns about it.
 - **pre-push** runs `just check` (evaluation plus building `checks/`) on each pushed commit.
 

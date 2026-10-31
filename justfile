@@ -15,7 +15,7 @@ format-all:
 check FLAKE=".":
     nix flake check {{quote(FLAKE)}}
 
-# Commit: parse and format-check staged .nix files, then `just eval` the
+# Commit: parse staged .nix files and `just fmt-all`, then `just eval` the
 # commit in the background. Push: `just check` each pushed commit.
 install-hooks:
     git config core.hooksPath .githooks
