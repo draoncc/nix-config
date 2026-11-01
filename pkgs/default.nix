@@ -4,4 +4,5 @@
 rec {
   luciole = pkgs.callPackage ./luciole.nix { };
   clip-notify = pkgs.callPackage ./clip-notify { };
+  fidoparole = pkgs.callPackage ./fidoparole { };
 }

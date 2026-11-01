@@ -12,6 +12,7 @@
     ./features/lang
     ./features/desktop/common
     ./features/desktop/optional/telegram.nix
+    ./features/desktop/optional/fidoparole.nix
   ];
 
   monitors = [
