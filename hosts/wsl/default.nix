@@ -48,6 +48,11 @@
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
+  # Hack to get Token2 Release3.3 working when attached via usbipd.
+  services.udev.extraRules = ''
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0666", TAG+="uaccess", ATTRS{idVendor}=="349e", ATTRS{idProduct}=="0024"
+  '';
+
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
