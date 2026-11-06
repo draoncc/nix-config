@@ -12,6 +12,7 @@
       };
 
       init.defaultBranch = "main";
+      push.autoSetupRemote = true;
     };
 
     lfs.enable = true;
